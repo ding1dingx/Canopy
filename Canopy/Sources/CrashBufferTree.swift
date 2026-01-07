@@ -15,7 +15,7 @@ private func crashSignalHandler(_ signal: Int32) {
 
 public final class CrashBufferTree: Tree {
     private let maxSize: Int
-    private var buffer: [String] = []
+    nonisolated(unsafe) private var buffer: [String] = []
     private let lock = NSLock()
 
     public init(maxSize: Int = 100) {
@@ -39,7 +39,7 @@ public final class CrashBufferTree: Tree {
         crashBufferTreeInstance = nil
     }
 
-    nonisolated(unsafe) public override func log(
+    nonisolated public override func log(
         priority: LogLevel,
         tag: String?,
         message: @autoclosure () -> String,
@@ -56,7 +56,7 @@ public final class CrashBufferTree: Tree {
         lock.unlock()
     }
 
-    nonisolated(unsafe) func flush() {
+    nonisolated func flush() {
         lock.lock()
         defer { lock.unlock() }
         guard let data = buffer.joined(separator: "\n").data(using: .utf8) else { return }
@@ -64,11 +64,11 @@ public final class CrashBufferTree: Tree {
         try? data.write(to: url, options: .atomic)
     }
 
-    nonisolated(unsafe) private func documentsURL() -> URL? {
+    nonisolated private func documentsURL() -> URL? {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     }
 
-    nonisolated(unsafe) public func recentLogs() -> String {
+    nonisolated public func recentLogs() -> String {
         lock.lock()
         defer { lock.unlock() }
         return buffer.joined(separator: "\n")

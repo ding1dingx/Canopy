@@ -13,7 +13,7 @@ import os.log
 
 open class DebugTree: Tree {
 
-    nonisolated(unsafe) public override func log(
+    nonisolated public override func log(
         priority: LogLevel,
         tag: String?,
         message: @autoclosure () -> String,
@@ -42,7 +42,7 @@ open class DebugTree: Tree {
         NSLog("%@", output)
     }
 
-    nonisolated(unsafe) private func buildFullMessage(_ template: String, _ args: [CVarArg], error: Error?) -> String {
+    nonisolated private func buildFullMessage(_ template: String, _ args: [CVarArg], error: Error?) -> String {
         let msg = formatMessage(template, args)
         if let err = error {
             return "\(msg) | Error: \(err.localizedDescription)"
@@ -50,7 +50,7 @@ open class DebugTree: Tree {
         return msg
     }
 
-    nonisolated(unsafe) private func autoTag(from file: StaticString) -> String {
+    nonisolated private func autoTag(from file: StaticString) -> String {
         let filePath = file.withUTF8Buffer { String(decoding: $0, as: UTF8.self) }
         return (filePath as NSString).lastPathComponent
             .split(separator: ".")
@@ -59,7 +59,7 @@ open class DebugTree: Tree {
 }
 
 private extension LogLevel {
-    var osLogLevel: OSLogType {
+    nonisolated var osLogLevel: OSLogType {
         switch self {
         case .verbose, .debug: return .debug
         case .info: return .info
