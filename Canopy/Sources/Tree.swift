@@ -67,6 +67,8 @@ open class Tree {
     }
 
     nonisolated(unsafe) func formatMessage(_ template: String, _ args: [CVarArg]) -> String {
+        // Validate inputs to prevent format string issues
+        guard !template.isEmpty else { return template }
         guard !args.isEmpty else { return template }
         return String(format: template, arguments: args)
     }

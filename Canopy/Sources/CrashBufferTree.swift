@@ -58,12 +58,10 @@ public final class CrashBufferTree: Tree {
 
     nonisolated(unsafe) func flush() {
         lock.lock()
-        let data = buffer.joined(separator: "\n").data(using: .utf8)!
-        lock.unlock()
-
-        if let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") {
-            try? data.write(to: url, options: .atomic)
-        }
+        defer { lock.unlock() }
+        guard let data = buffer.joined(separator: "\n").data(using: .utf8) else { return }
+        guard let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") else { return }
+        try? data.write(to: url, options: .atomic)
     }
 
     nonisolated(unsafe) private func documentsURL() -> URL? {
