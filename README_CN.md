@@ -13,10 +13,21 @@
 
 ## 快速开始
 
-```swift
-import Foundation
+使用 Swift Package Manager 或 CocoaPods 将 Canopy 添加到你的项目：
 
-// 在 AppDelegate.application(_:didFinishLaunchingWithOptions:) 中初始化
+```bash
+# Swift Package Manager
+dependencies: [
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.1.0")
+]
+
+# CocoaPods
+pod 'Canopy', '~> 0.1.0'
+```
+
+在 `AppDelegate` 中初始化：
+
+```swift
 #if DEBUG
 Canopy.plant(DebugTree())
 #endif

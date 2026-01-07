@@ -13,16 +13,27 @@ A lightweight, high-performance logging framework for iOS, inspired by Android's
 
 ## Quick Start
 
-```swift
-import Foundation
+Add Canopy to your project using Swift Package Manager or CocoaPods:
 
-// In AppDelegate.application(_:didFinishLaunchingWithOptions:)
+```bash
+# Swift Package Manager
+dependencies: [
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.1.0")
+]
+
+# CocoaPods
+pod 'Canopy', '~> 0.1.0'
+```
+
+Initialize in your `AppDelegate`:
+
+```swift
 #if DEBUG
 Canopy.plant(DebugTree())
 #endif
 Canopy.plant(CrashBufferTree(maxSize: 100))
 
-// Use anywhere in your app
+// Use anywhere
 Canopy.v("Verbose message")
 Canopy.d("Debug message")
 Canopy.i("Info message")
