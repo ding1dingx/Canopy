@@ -11,6 +11,7 @@ import Foundation
 import os.log
 #endif
 
+@available(iOS 14.0, macOS 11.0, *)
 open class DebugTree: Tree {
 
     nonisolated public override func log(
@@ -31,15 +32,12 @@ open class DebugTree: Tree {
         let output = "[\(effectiveTag)] \(fullMessage) (\(sourceRef))"
 
         #if canImport(os.log)
-        if #available(iOS 14.0, *) {
-            let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Canopy", category: effectiveTag)
-            let osLevel: OSLogType = priority.osLogLevel
-            logger.log(level: osLevel, "\(output)")
-            return
-        }
-        #endif
-
+        let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Canopy", category: effectiveTag)
+        let osLevel: OSLogType = priority.osLogLevel
+        logger.log(level: osLevel, "\(output)")
+        #else
         NSLog("%@", output)
+        #endif
     }
 
     nonisolated private func buildFullMessage(_ template: String, _ args: [CVarArg], error: Error?) -> String {

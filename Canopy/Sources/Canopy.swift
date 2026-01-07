@@ -6,21 +6,26 @@
 //
 
 import Foundation
+import os
 
 public enum Canopy {
-    private static let lock = NSLock()
+    private static var lock = os_unfair_lock()
     private static var trees: [Tree] = []
+    private static var cachedHasNonDebugTrees = false
+    private static var needsRecalc = true
 
     public static func plant(_ trees: Tree...) {
-        lock.lock()
-        defer { lock.unlock() }
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
         self.trees.append(contentsOf: trees)
+        needsRecalc = true
     }
 
     public static func uprootAll() {
-        lock.lock()
-        defer { lock.unlock() }
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
         trees.removeAll()
+        needsRecalc = true
     }
 
     @discardableResult
@@ -83,7 +88,21 @@ public enum Canopy {
     // MARK: - Internal Helpers
 
     private static func hasNonDebugTrees() -> Bool {
-        return trees.contains { !($0 is DebugTree) }
+        if needsRecalc {
+            os_unfair_lock_lock(&lock)
+            cachedHasNonDebugTrees = trees.contains { !isDebugTree($0) }
+            needsRecalc = false
+            os_unfair_lock_unlock(&lock)
+        }
+        return cachedHasNonDebugTrees
+    }
+
+    private static func isDebugTree(_ tree: Tree) -> Bool {
+        if #available(macOS 11.0, iOS 14.0, *) {
+            return tree is DebugTree
+        } else {
+            return String(describing: type(of: tree)).contains("DebugTree")
+        }
     }
 
     private static func log(
@@ -95,9 +114,9 @@ public enum Canopy {
         line: UInt
     ) {
         let capturedMessage = message()
-        lock.lock()
+        os_unfair_lock_lock(&lock)
         let treesToUse = self.trees
-        lock.unlock()
+        os_unfair_lock_unlock(&lock)
 
         treesToUse.forEach { tree in
             tree.prepareLog(
@@ -154,12 +173,11 @@ fileprivate extension Canopy {
         withTag tag: String?
     ) {
         let capturedMessage = message()
-        lock.lock()
+        os_unfair_lock_lock(&lock)
         let treesToUse = self.trees
-        lock.unlock()
+        os_unfair_lock_unlock(&lock)
 
         treesToUse.forEach { tree in
-            // Create a temporary tree with the tag
             let taggedTree = tree.tag(tag)
             taggedTree.prepareLog(
                 priority: priority,

@@ -6,37 +6,50 @@
 //
 
 import Foundation
+import os
 
-private var crashBufferTreeInstance: CrashBufferTree?
+nonisolated(unsafe) private var crashBufferTreeInstance: CrashBufferTree?
+nonisolated(unsafe) private var crashSignalOccurred: sig_atomic_t = 0
 
 private func crashSignalHandler(_ signal: Int32) {
+    crashSignalOccurred = 1
+}
+
+private func uncaughtExceptionHandler(_ exception: NSException) {
+    crashSignalOccurred = 1
+}
+
+private func exitHandler() {
     crashBufferTreeInstance?.flush()
 }
 
 public final class CrashBufferTree: Tree {
     private let maxSize: Int
     nonisolated(unsafe) private var buffer: [String] = []
-    private let lock = NSLock()
+    nonisolated(unsafe) private var lock = os_unfair_lock()
 
     public init(maxSize: Int = 100) {
         self.maxSize = maxSize
         super.init()
 
         crashBufferTreeInstance = self
-        NSSetUncaughtExceptionHandler { _ in
-            crashBufferTreeInstance?.flush()
-        }
 
         signal(SIGABRT, crashSignalHandler)
         signal(SIGSEGV, crashSignalHandler)
         signal(SIGBUS, crashSignalHandler)
         signal(SIGFPE, crashSignalHandler)
         signal(SIGILL, crashSignalHandler)
+        NSSetUncaughtExceptionHandler(uncaughtExceptionHandler)
+        atexit(exitHandler)
+
+        checkAndFlushOnCrash()
     }
 
-    @MainActor
-    deinit {
-        crashBufferTreeInstance = nil
+    private nonisolated func checkAndFlushOnCrash() {
+        if crashSignalOccurred == 1 {
+            flush()
+            crashSignalOccurred = 0
+        }
     }
 
     nonisolated public override func log(
@@ -49,16 +62,18 @@ public final class CrashBufferTree: Tree {
         function: StaticString,
         line: UInt
     ) {
+        checkAndFlushOnCrash()
+
         let msg = "[\(priority)] \(tag ?? ""): \(message())"
-        lock.lock()
+        os_unfair_lock_lock(&lock)
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }
-        lock.unlock()
+        os_unfair_lock_unlock(&lock)
     }
 
     nonisolated func flush() {
-        lock.lock()
-        defer { lock.unlock() }
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
         guard let data = buffer.joined(separator: "\n").data(using: .utf8) else { return }
         guard let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") else { return }
         try? data.write(to: url, options: .atomic)
@@ -69,8 +84,8 @@ public final class CrashBufferTree: Tree {
     }
 
     nonisolated public func recentLogs() -> String {
-        lock.lock()
-        defer { lock.unlock() }
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
         return buffer.joined(separator: "\n")
     }
 }

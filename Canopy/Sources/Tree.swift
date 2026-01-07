@@ -9,6 +9,7 @@ import Foundation
 
 open class Tree {
     nonisolated(unsafe) var explicitTag: String?
+    nonisolated(unsafe) open var minLevel: LogLevel = .verbose
 
     @discardableResult
     nonisolated open func tag(_ tag: String?) -> Self {
@@ -17,11 +18,7 @@ open class Tree {
     }
 
     nonisolated open func isLoggable(priority: LogLevel) -> Bool {
-        #if DEBUG
-        return true
-        #else
-        return false
-        #endif
+        return priority >= minLevel
     }
 
     nonisolated open func log(
@@ -67,9 +64,14 @@ open class Tree {
     }
 
     nonisolated func formatMessage(_ template: String, _ args: [CVarArg]) -> String {
-        // Validate inputs to prevent format string issues
         guard !template.isEmpty else { return template }
         guard !args.isEmpty else { return template }
+
+        let specifierCount = template.components(separatedBy: "%").count - 1
+        if specifierCount != args.count {
+            return template
+        }
+
         return String(format: template, arguments: args)
     }
 }

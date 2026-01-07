@@ -3,7 +3,6 @@ import PackageDescription
 
 let package = Package(
     name: "Canopy",
-    version: "0.1.0",
     platforms: [
         .iOS(.v13)
     ],
@@ -16,8 +15,7 @@ let package = Package(
     targets: [
         .target(
             name: "Canopy",
-            path: "Sources",
-            exclude: ["AppDelegate.swift", "SceneDelegate.swift", "ViewController.swift"]
+            path: "Canopy/Sources"
         ),
     ]
 )
