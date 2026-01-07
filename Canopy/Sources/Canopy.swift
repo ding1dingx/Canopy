@@ -98,11 +98,7 @@ public enum Canopy {
     }
 
     private static func isDebugTree(_ tree: Tree) -> Bool {
-        if #available(macOS 11.0, iOS 14.0, *) {
-            return tree is DebugTree
-        } else {
-            return String(describing: type(of: tree)).contains("DebugTree")
-        }
+        return tree is DebugTree
     }
 
     private static func log(

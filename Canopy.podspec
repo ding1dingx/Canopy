@@ -4,12 +4,12 @@ Pod::Spec.new do |s|
   s.summary          = 'A lightweight, high-performance logging framework for iOS'
   s.description      = <<-DESC
 Canopy is a logging framework inspired by Android's Timber, using a Tree-based architecture.
-It provides zero-overhead logging in Release mode and is compatible with iOS 13+.
+It provides zero-overhead logging in Release mode and is compatible with iOS 14+.
 
 Features:
 - Tree-based architecture for flexible logging
 - Performance optimized (zero overhead in Release mode when only DebugTree is used)
-- iOS 13+ support
+- iOS 14+ support
 - No external dependencies
                    DESC
 
@@ -18,7 +18,7 @@ Features:
   s.author           = { 'syxc' => 'nian1.wiki@gmail.com' }
   s.source           = { :git => 'https://github.com/ding1dingx/Canopy.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '13.0'
+  s.ios.deployment_target = '14.0'
   s.swift_version = '5.0'
 
   s.source_files = 'Sources/**/*.swift'

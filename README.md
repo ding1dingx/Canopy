@@ -8,7 +8,7 @@ A lightweight, high-performance logging framework for iOS, inspired by Android's
 
 - **Tree-based Architecture** - Flexible logging through pluggable trees
 - **Performance Optimized** - Zero overhead in Release mode when only `DebugTree` is used
-- **iOS 13+ Support** - Uses only Swift standard library and Foundation
+- **iOS 14+ Support** - Uses only Swift standard library and Foundation
 - **No External Dependencies** - Pure Swift implementation
 
 ## Quick Start
@@ -126,13 +126,13 @@ The included demo showcases all Canopy features:
 
 **Run Demo:**
 1. Open `Canopy.xcodeproj` in Xcode
-2. Select iOS 13.0+ simulator/device
+2. Select iOS 14.0+ simulator/device
 3. Build and run
 4. View logs in Xcode Console (⌘⇧Y)
 
 ## Requirements
 
-- iOS 13.0+
+- iOS 14.0+
 - Swift 5.0+
 - Xcode 12.0+
 

@@ -8,7 +8,7 @@
 
 - **Tree 架构** - 通过可插拔的 Tree 灵活配置日志
 - **性能优化** - Release 模式下如果只用 `DebugTree` 则零开销
-- **iOS 13+ 支持** - 仅使用 Swift 标准库和 Foundation
+- **iOS 14+ 支持** - 仅使用 Swift 标准库和 Foundation
 - **无外部依赖** - 纯 Swift 实现
 
 ## 快速开始
@@ -127,13 +127,13 @@ Canopy.tag("Analytics").v("事件已追踪：page_view")
 
 **运行演示：**
 1. 在 Xcode 中打开 `Canopy.xcodeproj`
-2. 选择 iOS 13.0+ 模拟器或真机
+2. 选择 iOS 14.0+ 模拟器或真机
 3. Build 并运行
 4. 在 Xcode Console（⌘⇧Y）中查看日志
 
 ## 要求
 
-- iOS 13.0+
+- iOS 14.0+
 - Swift 5.0+
 - Xcode 12.0+
 
