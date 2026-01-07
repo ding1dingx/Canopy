@@ -1,0 +1,51 @@
+# Xcode
+#
+# gitignore contributors: feel free to customize to your needs
+
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+*.mode2v3
+*.mode3v3
+*.perspectivev3
+xcuserdata
+
+# Swift Package Manager
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj/project.xcworkspace/
+.build/
+
+# CocoaPods
+Pods/
+*.xcworkspace
+
+# Carthage
+Carthage/Build/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection
+iOSInjectionProject/
+
+# macOS files
+.DS_Store
+.AppleDouble
+.AppleLanguages
+.swo
+.swp
+*~
+
+# Windows files
+Thumbs.db
+
+# Backup
+*.backup
+*.bak
+*.swp
