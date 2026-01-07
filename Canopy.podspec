@@ -24,9 +24,3 @@ Features:
   s.source_files = 'Sources/**/*.swift'
   s.frameworks = 'Foundation'
 end
-
-  s.subspec 'Trees' do |trees|
-    trees.source_files = 'Sources/{DebugTree,CrashBufferTree,AsyncTree}.swift'
-    trees.dependency 'Canopy/Core'
-  end
-end

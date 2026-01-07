@@ -1,5 +1,7 @@
 # Canopy
 
+> 🌲 Canopy：树冠覆盖森林，全面洞察你的 App。
+
 轻量级、高性能的 iOS 日志框架，灵感来自 Android 的 Timber。
 
 ## 特性

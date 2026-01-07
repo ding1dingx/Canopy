@@ -1,5 +1,7 @@
 # Canopy
 
+> 🌲 Canopy: A tree canopy covering your entire app's forest with comprehensive logging insights.
+
 A lightweight, high-performance logging framework for iOS, inspired by Android's Timber.
 
 ## Features
