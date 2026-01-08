@@ -77,7 +77,7 @@ final class TreeTests: XCTestCase {
         let tree = TestTree()
         tree.tag("Tag1")
 
-        tree.log(priority: .debug, tag: nil, message: "Test", error: nil)
+        tree.log(priority: .debug, tag: nil, message: "Test", arguments: [], error: nil, file: "", function: "", line: 1)
 
         XCTAssertNil(tree.explicitTag)
     }
@@ -93,14 +93,14 @@ final class TreeTests: XCTestCase {
 
     func testFormatMessageWithArgs() {
         let tree = TestTree()
-        let result = tree.formatMessage("User %s has %d items", ["Alice", 5])
+        let result = tree.formatMessage("User %@ has %lld items", ["Alice", 5])
 
         XCTAssertEqual(result, "User Alice has 5 items")
     }
 
     func testFormatMessageWithMultipleArgs() {
         let tree = TestTree()
-        let result = tree.formatMessage("%s %s %s %s", ["One", "Two", "Three", "Four"])
+        let result = tree.formatMessage("%@ %@ %@ %@", ["One", "Two", "Three", "Four"])
 
         XCTAssertEqual(result, "One Two Three Four")
     }
@@ -114,9 +114,10 @@ final class TreeTests: XCTestCase {
 
     func testFormatMessageWithMismatchedArgCount() {
         let tree = TestTree()
-        let result = tree.formatMessage("User %s logged in", ["Alice", "Extra"])
+        let result = tree.formatMessage("User %@ logged in", ["Alice", "Extra"])
 
-        XCTAssertEqual(result, "User Alice logged in")
+        // When specifier count doesn't match args count, return original template
+        XCTAssertEqual(result, "User %@ logged in")
     }
 
     // MARK: - Log Method Tests
@@ -125,8 +126,10 @@ final class TreeTests: XCTestCase {
         let tree = TestTree()
         tree.tag("CustomTag")
 
-        tree.log(priority: .debug, tag: nil, message: "Test", error: nil)
+        // The log method should use the captured tag
+        tree.log(priority: .debug, tag: nil, message: "Test", arguments: [], error: nil, file: "", function: "", line: 1)
 
-        XCTAssertEqual(tree.explicitTag, nil)
+        // After log, tag should be cleared
+        XCTAssertNil(tree.explicitTag)
     }
 }

@@ -139,7 +139,7 @@ final class CanopyTests: XCTestCase {
         let tree = TestTree()
         Canopy.plant(tree)
 
-        Canopy.d("User %s has %d items", "Alice", 5)
+        Canopy.d("User %@ has %lld items", "Alice", 5)
 
         XCTAssertEqual(tree.logs.count, 1)
         XCTAssertTrue(tree.logs.first?.message.contains("Alice") ?? false)
@@ -160,7 +160,7 @@ final class CanopyTests: XCTestCase {
         let tree = TestTree()
         Canopy.plant(tree)
 
-        Canopy.tag("API").i("User %s logged in", "Bob")
+        Canopy.tag("API").i("User %@ logged in", "Bob")
         Canopy.tag("DB").w("Slow query detected")
 
         XCTAssertEqual(tree.logs.count, 2)

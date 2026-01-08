@@ -52,7 +52,7 @@ final class DebugTreeTests: XCTestCase {
         let tree = DebugTree()
         Canopy.plant(tree)
 
-        XCTAssertNoThrow(Canopy.d("User %s logged in", "Alice"))
+        XCTAssertNoThrow(Canopy.d("User %@ logged in", "Alice"))
     }
 
     // MARK: - Level Filtering Tests
