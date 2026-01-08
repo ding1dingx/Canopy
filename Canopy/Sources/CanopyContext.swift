@@ -12,7 +12,7 @@ import UIKit
 #endif
 
 enum CanopyContext {
-    nonisolated private static let threadKey = "CanopyContext.current"
+    nonisolated private static let threadKey: String = "CanopyContext.current"
 
     nonisolated static var current: String? {
         get {

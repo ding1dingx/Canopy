@@ -11,7 +11,9 @@ import Foundation
 import os.log
 #endif
 
-open class DebugTree: Tree {
+/// A Tree that logs messages to the system console.
+/// Uses os.log on supported platforms, falls back to NSLog.
+open class DebugTree: Tree, @unchecked Sendable {
 
     nonisolated public override func log(
         priority: LogLevel,
@@ -24,8 +26,8 @@ open class DebugTree: Tree {
         line: UInt
     ) {
         let effectiveTag = explicitTag ?? tag ?? CanopyContext.current ?? autoTag(from: file)
-        explicitTag = nil  // Clear to prevent affecting subsequent logs
-        let fullMessage = buildFullMessage(message(), arguments, error: error)
+        explicitTag = nil
+        let fullMessage = buildFullMessage(message(), error: error)
 
         let fileName = (file.withUTF8Buffer { String(decoding: $0, as: UTF8.self) } as NSString).lastPathComponent
         let sourceRef = "\(fileName):\(line)"
@@ -43,12 +45,11 @@ open class DebugTree: Tree {
         NSLog("%@", output)
     }
 
-    nonisolated private func buildFullMessage(_ template: String, _ args: [CVarArg], error: Error?) -> String {
-        let msg = formatMessage(template, args)
+    nonisolated private func buildFullMessage(_ message: String, error: Error?) -> String {
         if let err = error {
-            return "\(msg) | Error: \(err.localizedDescription)"
+            return "\(message) | Error: \(err.localizedDescription)"
         }
-        return msg
+        return message
     }
 
     nonisolated private func autoTag(from file: StaticString) -> String {

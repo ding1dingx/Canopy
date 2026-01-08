@@ -7,8 +7,16 @@
 
 import Foundation
 
-open class Tree {
+/// Base class for all logging trees.
+/// Subclasses must ensure thread-safe access to properties using locks.
+/// Marked as @unchecked Sendable because subclasses use locks for thread safety.
+open class Tree: @unchecked Sendable {
+    /// Thread-unsafe tag property - must be protected by locks in subclasses.
+    /// Marked as nonisolated(unsafe) because subclasses use locks for thread safety.
     nonisolated(unsafe) var explicitTag: String?
+
+    /// Thread-unsafe minimum log level - must be protected by locks in subclasses.
+    /// Marked as nonisolated(unsafe) because subclasses use locks for thread safety.
     nonisolated(unsafe) open var minLevel: LogLevel = .verbose
 
     @discardableResult
@@ -18,7 +26,7 @@ open class Tree {
     }
 
     nonisolated open func isLoggable(priority: LogLevel) -> Bool {
-        return priority >= minLevel
+        priority >= minLevel
     }
 
     nonisolated open func log(
@@ -45,9 +53,7 @@ open class Tree {
         guard !args.isEmpty else { return template }
 
         let specifierCount = template.components(separatedBy: "%").count - 1
-        if specifierCount != args.count {
-            return template
-        }
+        guard specifierCount == args.count else { return template }
 
         return String(format: template, arguments: args)
     }

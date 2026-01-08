@@ -23,10 +23,17 @@ private func exitHandler() {
     crashBufferTreeInstance?.flush()
 }
 
-public final class CrashBufferTree: Tree {
+/// A Tree that buffers logs in memory and flushes them to a file on app exit or crash.
+/// Uses locks for thread-safe access to internal state.
+public final class CrashBufferTree: Tree, @unchecked Sendable {
+    /// Maximum number of logs to buffer.
     private let maxSize: Int
+    
+    /// Thread-unsafe buffer - protected by lock.
     nonisolated(unsafe) private var buffer: [String] = []
-    nonisolated(unsafe) private var lock = os_unfair_lock()
+    
+    /// Lock for thread-safe buffer access.
+    private let lock = NSLock()
 
     public init(maxSize: Int = 100) {
         self.maxSize = maxSize
@@ -65,18 +72,18 @@ public final class CrashBufferTree: Tree {
         checkAndFlushOnCrash()
 
         let effectiveTag = explicitTag ?? tag
-        explicitTag = nil  // Clear to prevent affecting subsequent logs
+        explicitTag = nil
 
         let msg = "[\(priority)] \(effectiveTag ?? ""): \(message())"
-        os_unfair_lock_lock(&lock)
+        lock.lock()
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }
-        os_unfair_lock_unlock(&lock)
+        lock.unlock()
     }
 
     nonisolated func flush() {
-        os_unfair_lock_lock(&lock)
-        defer { os_unfair_lock_unlock(&lock) }
+        lock.lock()
+        defer { lock.unlock() }
         guard let data = buffer.joined(separator: "\n").data(using: .utf8) else { return }
         guard let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") else { return }
         try? data.write(to: url, options: .atomic)
@@ -87,8 +94,8 @@ public final class CrashBufferTree: Tree {
     }
 
     nonisolated public func recentLogs() -> String {
-        os_unfair_lock_lock(&lock)
-        defer { os_unfair_lock_unlock(&lock) }
+        lock.lock()
+        defer { lock.unlock() }
         return buffer.joined(separator: "\n")
     }
 }

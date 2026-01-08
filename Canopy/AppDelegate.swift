@@ -21,8 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Canopy.plant(DebugTree())
         #endif
 
-        crashBufferTree = CrashBufferTree(maxSize: 50)
-        Canopy.plant(crashBufferTree!)
+        let crashTree = CrashBufferTree(maxSize: 50)
+        crashBufferTree = crashTree
+        Canopy.plant(crashTree)
 
         Canopy.v("Canopy initialized with DebugTree and CrashBufferTree")
     }
