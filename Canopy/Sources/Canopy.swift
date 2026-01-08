@@ -69,23 +69,23 @@ public enum Canopy {
     // MARK: - Log Methods
 
     public static func v(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.verbose, message(), args, file: file, function: function, line: line)
+        log(LogLevel.verbose, message(), args, file: file, function: function, line: line, withTag: nil)
     }
 
     public static func d(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.debug, message(), args, file: file, function: function, line: line)
+        log(LogLevel.debug, message(), args, file: file, function: function, line: line, withTag: nil)
     }
 
     public static func i(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.info, message(), args, file: file, function: function, line: line)
+        log(LogLevel.info, message(), args, file: file, function: function, line: line, withTag: nil)
     }
 
     public static func w(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.warning, message(), args, file: file, function: function, line: line)
+        log(LogLevel.warning, message(), args, file: file, function: function, line: line, withTag: nil)
     }
 
     public static func e(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.error, message(), args, file: file, function: function, line: line)
+        log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: nil)
     }
 
     // MARK: - Internal Helpers
@@ -98,38 +98,6 @@ public enum Canopy {
             lock.unlock()
         }
         return cachedHasNonDebugTrees
-    }
-
-    fileprivate static func log(
-        _ priority: LogLevel,
-        _ message: String,
-        _ args: [CVarArg],
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        #if !DEBUG
-        guard hasNonDebugTrees() else { return }
-        #endif
-
-        let treesToUse: [Tree]
-        lock.lock()
-        treesToUse = trees
-        lock.unlock()
-
-        for tree in treesToUse {
-            guard tree.isLoggable(priority: priority) else { continue }
-            tree.log(
-                priority: priority,
-                tag: nil,
-                message: message,
-                arguments: args,
-                error: nil,
-                file: file,
-                function: function,
-                line: line
-            )
-        }
     }
 
     fileprivate static func log(
@@ -152,8 +120,9 @@ public enum Canopy {
 
         for tree in treesToUse {
             guard tree.isLoggable(priority: priority) else { continue }
-            let taggedTree = tree.tag(tag)
-            taggedTree.log(
+
+            let loggableTree = tag != nil ? tree.tag(tag) : tree
+            loggableTree.log(
                 priority: priority,
                 tag: nil,
                 message: message,
