@@ -51,7 +51,10 @@ open class Tree: @unchecked Sendable {
         guard !template.isEmpty else { return template }
         guard !args.isEmpty else { return template }
 
-        let specifierCount = template.components(separatedBy: "%").count - 1
+        // Optimized: count % without creating intermediate strings
+        let specifierCount = template.reduce(into: 0) { count, char in
+            if char == "%" { count += 1 }
+        }
         guard specifierCount == args.count else { return template }
 
         return String(format: template, arguments: args)

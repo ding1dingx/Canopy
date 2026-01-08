@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import os
 
 // MARK: - Proxy for Tagged Logs (forward declaration needed)
 
