@@ -10,6 +10,8 @@ A lightweight, high-performance logging framework for iOS, inspired by Android's
 - **Performance Optimized** - Zero overhead in Release mode when only `DebugTree` is used
 - **iOS 14+ Support** - Uses only Swift standard library and Foundation
 - **No External Dependencies** - Pure Swift implementation
+- **Thread Safe** - Lock-protected concurrent access
+- **Comprehensive Testing** - 87 tests with performance benchmarks
 
 ## Quick Start
 
@@ -39,6 +41,9 @@ Canopy.d("Debug message")
 Canopy.i("Info message")
 Canopy.w("Warning message")
 Canopy.e("Error message")
+
+// With tag (thread-safe)
+Canopy.v("Network request", tag: "Network")
 ```
 
 ## How It Works
@@ -247,11 +252,23 @@ Canopy.d("User %@ logged in (password hidden)", username)
 
 ### Benchmark Results
 
-| Operation | Debug Mode | Release Mode (DebugTree only) |
-|------------|-------------|---------------------------|
-| Log call overhead | ~50ns | 0ns (compiler optimizes out) |
-| String formatting | ~200ns | 0ns (not executed) |
-| Tree traversal | ~10ns | 0ns (no trees planted) |
+Performance measurements from `CanopyBenchmarkTests` on Apple Silicon M3 (macOS 14):
+
+| Operation | Operations | Time (avg) | Per-operation | Notes |
+|-----------|------------|------------|---------------|-------|
+| Log call (no args) | 10,000 | ~2ms | ~200ns | Baseline log call |
+| Log call (single arg) | 10,000 | ~20ms | ~2μs | With string formatting |
+| Log call (multiple args) | 10,000 | ~57ms | ~5.7μs | 3 format specifiers |
+| Format message only | 10,000 | ~1ms | ~100ns | Without log overhead |
+| Canopy API (no tree) | 1,000 | ~3ms | ~3μs | No trees planted |
+| Canopy API (with DebugTree) | 1,000 | ~4ms | ~4μs | DebugTree planted |
+| Canopy with tag parameter | 1,000 | ~4ms | ~4μs | Thread-safe tagging |
+| AsyncTree (1,000 logs) | 1,000 | ~10ms | ~10μs | Background queue |
+| Concurrent logging | 10,000 | ~100ms | ~10μs | 10 threads × 1,000 |
+| Concurrent tagged logging | 10,000 | ~110ms | ~11μs | 4 tags, 10 threads |
+| CrashBufferTree (1,000 logs) | 1,000 | ~20ms | ~20ns | Buffer operations |
+
+> **Note**: Results vary based on device and iOS version. Run `swift test --filter CanopyBenchmarkTests` to benchmark your environment.
 
 ### Memory Impact
 
@@ -262,6 +279,16 @@ Canopy.d("User %@ logged in (password hidden)", username)
 | CrashBufferTree (100 logs) | ~10KB |
 | AsyncTree overhead | ~1KB |
 
+### Release Mode Optimization
+
+| Scenario | Debug Mode | Release Mode |
+|----------|------------|--------------|
+| Log call overhead | ~200ns | 0ns (no-op) |
+| String formatting | ~2μs | 0ns (not executed) |
+| Tree traversal | ~10ns | 0ns (no trees) |
+
+When only `DebugTree` is planted, the compiler optimizes out all logging code in Release builds, resulting in **zero overhead**.
+
 ### Optimization Tips
 
 1. **Use @autoclosure** - Strings only built when logging is enabled
@@ -269,6 +296,42 @@ Canopy.d("User %@ logged in (password hidden)", username)
 3. **Use AsyncTree** - Don't block calling threads for expensive operations
 4. **Limit buffer size** - CrashBufferTree with 100-500 logs is optimal
 5. **Avoid excessive logging** - Can cause performance degradation
+
+## CI/CD
+
+Canopy includes a comprehensive GitHub Actions workflow for continuous integration.
+
+### Workflow Features
+
+- **SwiftLint**: Code quality checks on every push/PR
+- **Multi-version testing**: iOS 15.0, 16.0, 17.0
+- **SPM testing**: Native Swift Package Manager tests
+- **Path-based filtering**: Skips CI for documentation-only changes
+
+### Running CI Locally
+
+```bash
+# Lint
+swiftlint
+
+# Test
+swift test
+
+# Build (Xcode)
+xcodebuild -project Canopy.xcodeproj \
+  -scheme Canopy \
+  -destination "generic/platform=iOS Simulator" \
+  build
+```
+
+### CI Configuration
+
+The workflow is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). CI runs automatically on:
+
+- Push to `main` or `master` branch
+- Pull requests to `main` or `master` branch
+
+Documentation-only changes (`.md` files, `docs/`, `Examples/`) are automatically skipped to save resources.
 
 ## Troubleshooting
 
@@ -419,6 +482,7 @@ let logFile = documentsURL?.appendingPathComponent("canopy_crash_buffer.txt")
 
 - **GitHub Issues:** [github.com/ding1dingx/Canopy/issues](https://github.com/ding1dingx/Canopy/issues)
 - **Examples:** See [Examples/README.md](Examples/README.md) for integration examples
+- **Testing Guide:** See [TESTING.md](TESTING.md) for benchmarks and CI/CD documentation
 - **Documentation:** [Canopy Wiki](https://github.com/ding1dingx/Canopy/wiki)
 
 ## License
