@@ -66,7 +66,11 @@ class ViewController: UIViewController {
         stackView.addArrangedSubview(formatButton)
 
         // Tagged Log Button
-        let taggedButton = createButton(title: "Tagged Log", color: UIColor(red: 0.0, green: 0.75, blue: 0.75, alpha: 1.0), action: #selector(testTagged))
+        let taggedButton = createButton(
+            title: "Tagged Log",
+            color: UIColor(red: 0.0, green: 0.75, blue: 0.75, alpha: 1.0),
+            action: #selector(testTagged)
+        )
         stackView.addArrangedSubview(taggedButton)
 
         // Async Log Button
@@ -74,7 +78,11 @@ class ViewController: UIViewController {
         stackView.addArrangedSubview(asyncButton)
 
         // View Crash Buffer Button
-        let viewBufferButton = createButton(title: "View Crash Buffer", color: .systemGray, action: #selector(viewCrashBuffer))
+        let viewBufferButton = createButton(
+            title: "View Crash Buffer",
+            color: .systemGray,
+            action: #selector(viewCrashBuffer)
+        )
         stackView.addArrangedSubview(viewBufferButton)
 
         view.addSubview(stackView)
@@ -152,9 +160,9 @@ class ViewController: UIViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             Canopy.v("Background task started")
 
-            for i in 1...5 {
+            for itemIndex in 1...5 {
                 Thread.sleep(forTimeInterval: 0.1)
-                Canopy.d("Processing item %d of 5", i)
+                Canopy.d("Processing item %d of 5", itemIndex)
             }
 
             Canopy.i("Background task completed")
@@ -182,5 +190,4 @@ class ViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
 }

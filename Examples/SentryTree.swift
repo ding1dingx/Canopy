@@ -12,7 +12,7 @@ open class SentryTree: Tree {
     private let sentry: Any
     private let bufferSize: Int
     private var logBuffer: [LogEntry] = []
-    private let queue = DispatchQueue(label: "com.canopy.sentrytree")
+    private let queue: DispatchQueue = DispatchQueue(label: "com.canopy.sentrytree")
 
     /// Initialize SentryTree with Sentry instance and buffer size
     public init(

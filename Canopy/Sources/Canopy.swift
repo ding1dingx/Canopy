@@ -42,10 +42,10 @@ public struct TaggedTreeProxy {
 /// The main entry point for the Canopy logging framework.
 /// All logging operations go through this enum.
 public enum Canopy {
-    private static let lock = NSLock()
+    private static let lock: NSLock = NSLock()
     private static var trees: [Tree] = []
-    private static var cachedHasNonDebugTrees = false
-    private static var needsRecalc = true
+    private static var cachedHasNonDebugTrees: Bool = false
+    private static var needsRecalc: Bool = true
 
     public static func plant(_ trees: Tree...) {
         lock.lock()

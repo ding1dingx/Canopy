@@ -43,8 +43,8 @@ open class RemoteLogTree: Tree {
     private var buffer: [LogEntry] = []
     private var flushTimer: Timer?
     private var isFlushing = false
-    private let lock = NSLock()
-    private let queue = DispatchQueue(label: "com.canopy.remotelogtree")
+    private let lock: NSLock = NSLock()
+    private let queue: DispatchQueue = DispatchQueue(label: "com.canopy.remotelogtree")
 
     /// Initialize with configuration and minimum log level
     public init(config: Configuration, minLevel: LogLevel = .info) {

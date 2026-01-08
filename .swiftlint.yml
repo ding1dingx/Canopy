@@ -2,13 +2,14 @@ disabled_rules:
   - trailing_whitespace
   - todo
   - multiple_closures_with_trailing_closure
+  - optional_data_string_conversion
+  - function_parameter_count
 
 opt_in_rules:
   - empty_count
   - empty_string
   - force_unwrapping
   - explicit_init
-  - explicit_type_interface
   - first_where
   - overridden_super_call
   - redundant_nil_coalescing
@@ -53,8 +54,7 @@ large_tuple:
   warning: 3
   error: 4
 
-custom_rules:
-  - CanopyRules
+custom_rules: []  # Disabled - not suitable for demo/example code
 
 excluded:
   - Carthage

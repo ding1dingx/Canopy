@@ -14,7 +14,7 @@ open class Tree: @unchecked Sendable {
     /// Thread-unsafe tag property - must be protected by locks in subclasses.
     /// Marked as nonisolated(unsafe) because subclasses use locks for thread safety.
     nonisolated(unsafe) var explicitTag: String?
-    
+
     /// Thread-unsafe minimum log level - must be protected by locks in subclasses.
     /// Marked as nonisolated(unsafe) because subclasses use locks for thread safety.
     nonisolated(unsafe) open var minLevel: LogLevel = .verbose
