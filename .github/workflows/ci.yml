@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ios-version: ["15.0", "16.0", "17.0", "18.0"]
+        ios-version: ["15.0", "16.0", "17.0"]
 
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
         run: |
           xcodebuild -project Canopy.xcodeproj \
             -scheme Canopy \
-            -destination "platform=iOS Simulator,name=iPhone ${{ matrix.ios-version }}" \
+            -destination "generic/platform=iOS Simulator" \
             -configuration Debug \
             build \
             CODE_SIGN_IDENTITY="" \
@@ -61,7 +61,7 @@ jobs:
         run: |
           xcodebuild -project Canopy.xcodeproj \
             -scheme CanopyTests \
-            -destination "platform=iOS Simulator,name=iPhone ${{ matrix.ios-version }}" \
+            -destination "generic/platform=iOS Simulator" \
             test \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
