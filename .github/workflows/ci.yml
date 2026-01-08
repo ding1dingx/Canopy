@@ -1,0 +1,61 @@
+name: Canopy CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    name: SwiftLint
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SwiftLint
+        run: brew install swiftlint
+
+      - name: Run SwiftLint
+        run: swiftlint
+
+  build-and-test:
+    name: Build & Test (iOS ${{ matrix.ios-version }})
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        ios-version: ["15.0", "16.0", "17.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild -project Canopy.xcodeproj \
+            -scheme Canopy \
+            -destination "platform=iOS Simulator,name=iPhone ${{ matrix.ios-version }}" \
+            -configuration Debug \
+            build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Run Tests
+        run: |
+          xcodebuild -project Canopy.xcodeproj \
+            -scheme CanopyTests \
+            -destination "platform=iOS Simulator,name=iPhone ${{ matrix.ios-version }}" \
+            test \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+  spm-test:
+    name: SPM Test (macOS)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Swift Package Manager Tests
+        run: swift test
