@@ -290,7 +290,7 @@ final class CanopyTests: XCTestCase {
     }
 }
 
-class TestTree: Tree {
+class TestTree: Tree, @unchecked Sendable {
     struct LogEntry {
         let level: LogLevel
         let tag: String?

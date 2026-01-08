@@ -7,7 +7,9 @@
 
 import Foundation
 
-public final class AsyncTree: Tree {
+/// A Tree wrapper that executes logs asynchronously on a background queue.
+/// This prevents logging operations from blocking the calling thread.
+public final class AsyncTree: Tree, @unchecked Sendable {
     private let wrapped: Tree
     private let queue: DispatchQueue
 
@@ -36,15 +38,15 @@ public final class AsyncTree: Tree {
         explicitTag = nil
         let capturedMessage = formatMessage(message(), arguments)
 
-        queue.async {
+        queue.async { [wrapped] in
             let previous = CanopyContext.current
             CanopyContext.current = currentContext
 
-            self.wrapped.log(
+            wrapped.log(
                 priority: priority,
                 tag: capturedTag,
                 message: capturedMessage,
-                arguments: arguments,
+                arguments: [],
                 error: error,
                 file: file,
                 function: function,
