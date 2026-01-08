@@ -31,19 +31,25 @@ public final class AsyncTree: Tree {
         function: StaticString,
         line: UInt
     ) {
-        // Capture context NOW (on caller thread)
         let currentContext = CanopyContext.current
-        let explicitTag = self.explicitTag
-        self.explicitTag = nil
+        let capturedTag = self.explicitTag
+        self.explicitTag = nil  // Clear immediately to prevent affecting subsequent logs
         let capturedMessage = formatMessage(message(), arguments)
 
         queue.async {
-            // Restore context in background
             let previous = CanopyContext.current
             CanopyContext.current = currentContext
 
-            self.wrapped.tag(explicitTag)
-                .log(priority: priority, tag: explicitTag, message: capturedMessage, error: error)
+            self.wrapped.log(
+                priority: priority,
+                tag: capturedTag,
+                message: capturedMessage,
+                arguments: arguments,
+                error: error,
+                file: file,
+                function: function,
+                line: line
+            )
 
             CanopyContext.current = previous
         }
