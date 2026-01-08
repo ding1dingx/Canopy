@@ -36,13 +36,8 @@ jobs:
         run: swiftlint
 
   build-and-test:
-    name: Build & Test (iOS ${{ matrix.ios-version }})
+    name: Build & Test
     runs-on: macos-15
-    strategy:
-      fail-fast: false
-      matrix:
-        ios-version: ["15.0", "16.0", "17.0"]
-
     steps:
       - uses: actions/checkout@v4
 
@@ -57,21 +52,6 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Run Tests
-        run: |
-          xcodebuild -project Canopy.xcodeproj \
-            -scheme CanopyTests \
-            -destination "generic/platform=iOS Simulator" \
-            test \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-  spm-test:
-    name: SPM Test (macOS)
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Swift Package Manager Tests
+      - name: Run SPM Tests
         run: swift test
+
