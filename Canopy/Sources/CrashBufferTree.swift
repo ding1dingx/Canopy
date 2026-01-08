@@ -64,7 +64,10 @@ public final class CrashBufferTree: Tree {
     ) {
         checkAndFlushOnCrash()
 
-        let msg = "[\(priority)] \(tag ?? ""): \(message())"
+        let effectiveTag = explicitTag ?? tag
+        explicitTag = nil  // 重要：清除 tag，避免影响后续日志
+
+        let msg = "[\(priority)] \(effectiveTag ?? ""): \(message())"
         os_unfair_lock_lock(&lock)
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }

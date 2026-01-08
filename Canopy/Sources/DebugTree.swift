@@ -23,7 +23,8 @@ open class DebugTree: Tree {
         function: StaticString,
         line: UInt
     ) {
-        let effectiveTag = tag ?? CanopyContext.current ?? autoTag(from: file)
+        let effectiveTag = explicitTag ?? tag ?? CanopyContext.current ?? autoTag(from: file)
+        explicitTag = nil  // Clear to prevent affecting subsequent logs
         let fullMessage = buildFullMessage(message(), arguments, error: error)
 
         let fileName = (file.withUTF8Buffer { String(decoding: $0, as: UTF8.self) } as NSString).lastPathComponent

@@ -115,11 +115,13 @@ public enum Canopy {
         os_unfair_lock_unlock(&lock)
 
         treesToUse.forEach { tree in
-            tree.prepareLog(
+            guard tree.isLoggable(priority: priority) else { return }
+            tree.log(
                 priority: priority,
+                tag: nil,
                 message: capturedMessage,
                 arguments: args,
-                error: nil as Error?,
+                error: nil,
                 file: file,
                 function: function,
                 line: line
@@ -174,12 +176,14 @@ fileprivate extension Canopy {
         os_unfair_lock_unlock(&lock)
 
         treesToUse.forEach { tree in
+            guard tree.isLoggable(priority: priority) else { return }
             let taggedTree = tree.tag(tag)
-            taggedTree.prepareLog(
+            taggedTree.log(
                 priority: priority,
+                tag: nil,
                 message: capturedMessage,
                 arguments: args,
-                error: nil as Error?,
+                error: nil,
                 file: file,
                 function: function,
                 line: line
