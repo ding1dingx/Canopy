@@ -65,7 +65,7 @@ public final class CrashBufferTree: Tree {
         checkAndFlushOnCrash()
 
         let effectiveTag = explicitTag ?? tag
-        explicitTag = nil  // 重要：清除 tag，避免影响后续日志
+        explicitTag = nil  // Clear to prevent affecting subsequent logs
 
         let msg = "[\(priority)] \(effectiveTag ?? ""): \(message())"
         os_unfair_lock_lock(&lock)
