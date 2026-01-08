@@ -68,24 +68,24 @@ public enum Canopy {
 
     // MARK: - Log Methods
 
-    public static func v(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.verbose, message(), args, file: file, function: function, line: line, withTag: nil)
+    public static func v(_ message: @autoclosure () -> String, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.verbose, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
-    public static func d(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.debug, message(), args, file: file, function: function, line: line, withTag: nil)
+    public static func d(_ message: @autoclosure () -> String, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.debug, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
-    public static func i(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.info, message(), args, file: file, function: function, line: line, withTag: nil)
+    public static func i(_ message: @autoclosure () -> String, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.info, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
-    public static func w(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.warning, message(), args, file: file, function: function, line: line, withTag: nil)
+    public static func w(_ message: @autoclosure () -> String, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.warning, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
-    public static func e(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: nil)
+    public static func e(_ message: @autoclosure () -> String, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
     // MARK: - Internal Helpers

@@ -39,9 +39,8 @@ open class Tree: @unchecked Sendable {
         function: StaticString,
         line: UInt
     ) {
-        let localExplicitTag = explicitTag
+        let tagToUse = explicitTag ?? tag
         explicitTag = nil
-        let tagToUse = localExplicitTag ?? tag
         let msg = formatMessage(message(), arguments)
         log(priority: priority, tag: tagToUse, message: msg, error: error)
     }
