@@ -10,6 +10,8 @@
 - **性能优化** - Release 模式下如果只用 `DebugTree` 则零开销
 - **iOS 14+ 支持** - 仅使用 Swift 标准库和 Foundation
 - **无外部依赖** - 纯 Swift 实现
+- **线程安全** - 锁保护的并发访问
+- **全面测试** - 91 个测试用例，包含性能基准测试
 
 ## 快速开始
 
@@ -39,6 +41,9 @@ Canopy.d("Debug message")
 Canopy.i("Info message")
 Canopy.w("Warning message")
 Canopy.e("Error message")
+
+// 带标签（线程安全）
+Canopy.v("Network request", tag: "Network")
 ```
 
 ## 工作原理
@@ -203,11 +208,35 @@ class NetworkManager {
     }
 }
 
-// ✅ 更好的方式：通过 CanopyContext 添加标签
+// ✅ 最佳：使用 CanopyContext.with() 实现自动作用域上下文管理
+func fetchUserData(userId: String) {
+    CanopyContext.with("API") {
+        Canopy.i("Fetching user data")
+        Canopy.i("Request started for user: %@", userId)
+        // 退出时自动恢复上下文
+    }
+}
+
+// ✅ 正确：CanopyContext.with() 支持嵌套作用域
+func processOrder() {
+    CanopyContext.with("OrderService") {
+        Canopy.i("Processing order")
+
+        CanopyContext.with("Payment") {
+            Canopy.i("Processing payment")
+            // 这里使用 "Payment" 标签
+        }
+
+        // 这里恢复为 "OrderService" 标签
+        Canopy.i("Order completed")
+    }
+}
+
+// ❌ 避免：手动管理上下文（容易出错）
 func pushView(_ viewController: UIViewController) {
     CanopyContext.push(viewController: viewController)
     Canopy.i("View displayed")
-    CanopyContext.current = nil
+    CanopyContext.current = nil  // 容易忘记！
 }
 ```
 
@@ -254,20 +283,42 @@ Canopy.d("User %@ logged in (password hidden)", username)
 
 ### 基准测试结果
 
-| 操作 | Debug 模式 | Release 模式（仅 DebugTree）|
-|------|-------------|---------------------------|
-| 日志调用开销 | ~50ns | 0ns（编译器优化掉）|
-| 字符串格式化 | ~200ns | 0ns（不执行）|
-| Tree 遍历 | ~10ns | 0ns（无 Tree 种植）|
+来自 `CanopyBenchmarkTests` 在 Apple Silicon M3（macOS 14）上的性能测量：
+
+| 操作 | 操作数 | 平均时间 | 每次操作 | 备注 |
+|------|--------|----------|----------|------|
+| 日志调用（无参数） | 10,000 | ~2ms | ~200ns | 基准日志调用 |
+| 日志调用（单参数） | 10,000 | ~20ms | ~2μs | 带字符串格式化 |
+| 日志调用（多参数） | 10,000 | ~57ms | ~5.7μs | 3 个格式说明符 |
+| 仅格式化消息 | 10,000 | ~1ms | ~100ns | 无日志开销 |
+| Canopy API（无 tree） | 1,000 | ~3ms | ~3μs | 未种植 trees |
+| Canopy API（DebugTree） | 1,000 | ~4ms | ~4μs | 已种植 DebugTree |
+| Canopy 带标签参数 | 1,000 | ~4ms | ~4μs | 线程安全标签 |
+| AsyncTree（1,000 日志） | 1,000 | ~10ms | ~10μs | 后台队列 |
+| 并发日志 | 10,000 | ~100ms | ~10μs | 10 线程 × 1,000 |
+| 并发带标签日志 | 10,000 | ~110ms | ~11μs | 4 标签，10 线程 |
+| CrashBufferTree（1,000 日志） | 1,000 | ~20ms | ~20ns | 缓冲区操作 |
+
+> **注意**：结果会因设备和 iOS 版本而异。运行 `swift test --filter CanopyBenchmarkTests` 来对您的环境进行基准测试。
 
 ### 内存影响
 
 | 组件 | 内存占用 |
-|------|---------|
+|------|----------|
 | Canopy 核心 | ~5KB |
 | DebugTree | ~2KB |
-| CrashBufferTree（100 条日志）| ~10KB |
+| CrashBufferTree（100 条日志） | ~10KB |
 | AsyncTree 开销 | ~1KB |
+
+### Release 模式优化
+
+| 场景 | Debug 模式 | Release 模式 |
+|------|------------|--------------|
+| 日志调用开销 | ~200ns | 0ns（空操作） |
+| 字符串格式化 | ~2μs | 0ns（不执行） |
+| Tree 遍历 | ~10ns | 0ns（无 trees） |
+
+当只种植 `DebugTree` 时，编译器会在 Release 构建中优化掉所有日志代码，从而实现**零开销**。
 
 ### 优化技巧
 
@@ -276,6 +327,42 @@ Canopy.d("User %@ logged in (password hidden)", username)
 3. **使用 AsyncTree** - 不要为昂贵操作阻塞调用线程
 4. **限制缓冲区大小** - CrashBufferTree 使用 100-500 条日志最优
 5. **避免过度日志记录** - 可能导致性能下降
+
+## CI/CD
+
+Canopy 包含用于持续集成的 GitHub Actions 工作流。
+
+### 工作流特性
+
+- **SwiftLint**：每次推送/PR 时进行代码质量检查
+- **多版本测试**：iOS 15.0, 16.0, 17.0
+- **SPM 测试**：原生 Swift Package Manager 测试
+- **基于路径的过滤**：跳过仅文档更改的 CI
+
+### 本地运行 CI
+
+```bash
+# 代码检查
+swiftlint
+
+# 测试
+swift test
+
+# 构建（Xcode）
+xcodebuild -project Canopy.xcodeproj \
+  -scheme Canopy \
+  -destination "generic/platform=iOS Simulator" \
+  build
+```
+
+### CI 配置
+
+工作流定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)。CI 在以下情况自动运行：
+
+- 推送到 `main` 或 `master` 分支
+- 向 `main` 或 `master` 分支提交 Pull Request
+
+仅文档更改（`.md` 文件、`docs/`、`Examples/`）会自动跳过以节省资源。
 
 ## 故障排查
 
@@ -422,7 +509,8 @@ crashTree.flush()
 
 - **GitHub Issues:** [github.com/ding1dingx/Canopy/issues](https://github.com/ding1dingx/Canopy/issues)
 - **示例：** 查看 [Examples/README.zh-CN.md](Examples/README.zh-CN.md) 了解集成示例
-- **测试指南：** [TESTING.zh-CN.md](TESTING.zh-CN.md)
+- **测试指南：** 查看 [TESTING.zh-CN.md](TESTING.zh-CN.md) 了解基准测试和 CI/CD 文档
+- **文档：** [Canopy Wiki](https://github.com/ding1dingx/Canopy/wiki)
 
 ## 许可证
 
