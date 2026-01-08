@@ -17,5 +17,10 @@ let package = Package(
             name: "Canopy",
             path: "Canopy/Sources"
         ),
+        .testTarget(
+            name: "CanopyTests",
+            dependencies: ["Canopy"],
+            path: "CanopyTests"
+        ),
     ]
 )
