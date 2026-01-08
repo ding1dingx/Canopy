@@ -25,8 +25,8 @@ private func exitHandler() {
 
 public final class CrashBufferTree: Tree {
     private let maxSize: Int
-    nonisolated(unsafe) private var buffer: [String] = []
-    nonisolated(unsafe) private var lock = os_unfair_lock()
+    private var buffer: [String] = []
+    private var lock = os_unfair_lock()
 
     public init(maxSize: Int = 100) {
         self.maxSize = maxSize

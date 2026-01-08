@@ -32,8 +32,8 @@ public final class AsyncTree: Tree {
         line: UInt
     ) {
         let currentContext = CanopyContext.current
-        let capturedTag = self.explicitTag
-        self.explicitTag = nil  // Clear immediately to prevent affecting subsequent logs
+        let capturedTag = explicitTag
+        explicitTag = nil
         let capturedMessage = formatMessage(message(), arguments)
 
         queue.async {

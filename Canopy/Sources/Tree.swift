@@ -8,8 +8,8 @@
 import Foundation
 
 open class Tree {
-    nonisolated(unsafe) var explicitTag: String?
-    nonisolated(unsafe) open var minLevel: LogLevel = .verbose
+    var explicitTag: String?
+    open var minLevel: LogLevel = .verbose
 
     @discardableResult
     nonisolated open func tag(_ tag: String?) -> Self {
