@@ -11,7 +11,7 @@ A lightweight, high-performance logging framework for iOS, inspired by Android's
 - **iOS 14+ Support** - Uses only Swift standard library and Foundation
 - **No External Dependencies** - Pure Swift implementation
 - **Thread Safe** - Lock-protected concurrent access
-- **Comprehensive Testing** - 87 tests with performance benchmarks
+- **Comprehensive Testing** - 91 tests with performance benchmarks
 
 ## Quick Start
 
@@ -201,11 +201,35 @@ class NetworkManager {
     }
 }
 
-// ✅ EVEN BETTER: Tag via CanopyContext
+// ✅ BEST: Use CanopyContext.with() for automatic scope-based context
+func fetchUserData(userId: String) {
+    CanopyContext.with("API") {
+        Canopy.i("Fetching user data")
+        Canopy.i("Request started for user: %@", userId)
+        // Context automatically restored on exit
+    }
+}
+
+// ✅ GOOD: CanopyContext.with() with nested scopes
+func processOrder() {
+    CanopyContext.with("OrderService") {
+        Canopy.i("Processing order")
+
+        CanopyContext.with("Payment") {
+            Canopy.i("Processing payment")
+            // "Payment" tag is active here
+        }
+
+        // "OrderService" tag is restored here
+        Canopy.i("Order completed")
+    }
+}
+
+// ❌ AVOID: Manual context management (error-prone)
 func pushView(_ viewController: UIViewController) {
     CanopyContext.push(viewController: viewController)
     Canopy.i("View displayed")
-    CanopyContext.current = nil
+    CanopyContext.current = nil  // Easy to forget!
 }
 ```
 

@@ -288,6 +288,67 @@ final class CanopyTests: XCTestCase {
 
         XCTAssertEqual(tree.logs.count, 1000)
     }
+
+    func testCanopyContextWithScopedTag() throws {
+        CanopyContext.current = nil  // Ensure clean state
+        XCTAssertNil(CanopyContext.current)
+
+        let result = CanopyContext.with("ScopedTag") {
+            XCTAssertEqual(CanopyContext.current, "ScopedTag")
+            return "completed"
+        }
+
+        XCTAssertEqual(result, "completed")
+        XCTAssertNil(CanopyContext.current, "Context should be restored after with()")
+    }
+
+    func testCanopyContextWithNilTag() throws {
+        CanopyContext.current = nil  // Ensure clean state
+
+        let result = CanopyContext.with(nil) {
+            XCTAssertNil(CanopyContext.current)
+            return "nil-tag"
+        }
+
+        XCTAssertEqual(result, "nil-tag")
+        XCTAssertNil(CanopyContext.current, "Previous context should be restored")
+    }
+
+    func testCanopyContextWithNestedScopes() throws {
+        CanopyContext.current = nil  // Ensure clean state
+
+        let result = CanopyContext.with("Middle") {
+            XCTAssertEqual(CanopyContext.current, "Middle")
+
+            let inner = CanopyContext.with("Inner") {
+                XCTAssertEqual(CanopyContext.current, "Inner")
+                return "inner-completed"
+            }
+
+            XCTAssertEqual(inner, "inner-completed")
+            XCTAssertEqual(CanopyContext.current, "Middle", "Should restore to Middle scope")
+            return "middle-completed"
+        }
+
+        XCTAssertEqual(result, "middle-completed")
+        XCTAssertNil(CanopyContext.current, "Should restore to nil")
+    }
+
+    func testCanopyContextWithErrorHandling() throws {
+        CanopyContext.current = nil  // Ensure clean state
+        XCTAssertNil(CanopyContext.current)
+
+        do {
+            try CanopyContext.with("ErrorScope") {
+                XCTAssertEqual(CanopyContext.current, "ErrorScope")
+                throw NSError(domain: "Test", code: 1, userInfo: nil)
+            }
+        } catch {
+            // Expected error
+        }
+
+        XCTAssertNil(CanopyContext.current, "Context should be restored even after error")
+    }
 }
 
 class TestTree: Tree, @unchecked Sendable {

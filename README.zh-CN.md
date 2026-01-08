@@ -11,7 +11,7 @@
 - **iOS 14+ 支持** - 仅使用 Swift 标准库和 Foundation
 - **无外部依赖** - 纯 Swift 实现
 - **线程安全** - 锁保护的并发访问
-- **全面测试** - 87 个测试用例，包含性能基准测试
+- **全面测试** - 91 个测试用例，包含性能基准测试
 
 ## 快速开始
 
@@ -208,11 +208,35 @@ class NetworkManager {
     }
 }
 
-// ✅ 更好的方式：通过 CanopyContext 添加标签
+// ✅ 最佳：使用 CanopyContext.with() 实现自动作用域上下文管理
+func fetchUserData(userId: String) {
+    CanopyContext.with("API") {
+        Canopy.i("Fetching user data")
+        Canopy.i("Request started for user: %@", userId)
+        // 退出时自动恢复上下文
+    }
+}
+
+// ✅ 正确：CanopyContext.with() 支持嵌套作用域
+func processOrder() {
+    CanopyContext.with("OrderService") {
+        Canopy.i("Processing order")
+
+        CanopyContext.with("Payment") {
+            Canopy.i("Processing payment")
+            // 这里使用 "Payment" 标签
+        }
+
+        // 这里恢复为 "OrderService" 标签
+        Canopy.i("Order completed")
+    }
+}
+
+// ❌ 避免：手动管理上下文（容易出错）
 func pushView(_ viewController: UIViewController) {
     CanopyContext.push(viewController: viewController)
     Canopy.i("View displayed")
-    CanopyContext.current = nil
+    CanopyContext.current = nil  // 容易忘记！
 }
 ```
 
