@@ -17,11 +17,11 @@ public final class AsyncTree: Tree {
         super.init()
     }
 
-    nonisolated(unsafe) public override func isLoggable(priority: LogLevel) -> Bool {
+    nonisolated public override func isLoggable(priority: LogLevel) -> Bool {
         wrapped.isLoggable(priority: priority)
     }
 
-    nonisolated(unsafe) public override func log(
+    nonisolated public override func log(
         priority: LogLevel,
         tag: String?,
         message: @autoclosure () -> String,
@@ -35,7 +35,7 @@ public final class AsyncTree: Tree {
         let currentContext = CanopyContext.current
         let explicitTag = self.explicitTag
         self.explicitTag = nil
-        let capturedMessage = message()
+        let capturedMessage = formatMessage(message(), arguments)
 
         queue.async {
             // Restore context in background
@@ -43,7 +43,7 @@ public final class AsyncTree: Tree {
             CanopyContext.current = currentContext
 
             self.wrapped.tag(explicitTag)
-                .log(priority: priority, tag: explicitTag, message: capturedMessage, arguments: arguments, error: error, file: file, function: function, line: line)
+                .log(priority: priority, tag: explicitTag, message: capturedMessage, error: error)
 
             CanopyContext.current = previous
         }

@@ -53,7 +53,7 @@ open Canopy.xcodeproj
 
 ## Testing
 
-- Test on iOS 13.0+ simulators
+- Test on iOS 14.0+ simulators
 - Test on physical devices if possible
 - Test both Debug and Release configurations
 

@@ -9,22 +9,19 @@ import Foundation
 
 open class Tree {
     nonisolated(unsafe) var explicitTag: String?
+    nonisolated(unsafe) open var minLevel: LogLevel = .verbose
 
     @discardableResult
-    nonisolated(unsafe) open func tag(_ tag: String?) -> Self {
+    nonisolated open func tag(_ tag: String?) -> Self {
         self.explicitTag = tag?.isEmpty == false ? tag : nil
         return self
     }
 
-    nonisolated(unsafe) open func isLoggable(priority: LogLevel) -> Bool {
-        #if DEBUG
-        return true
-        #else
-        return false
-        #endif
+    nonisolated open func isLoggable(priority: LogLevel) -> Bool {
+        return priority >= minLevel
     }
 
-    nonisolated(unsafe) open func log(
+    nonisolated open func log(
         priority: LogLevel,
         tag: String?,
         message: @autoclosure () -> String,
@@ -38,9 +35,9 @@ open class Tree {
         log(priority: priority, tag: tag, message: msg, error: error)
     }
 
-    nonisolated(unsafe) open func log(priority: LogLevel, tag: String?, message: String, error: Error?) {}
+    nonisolated open func log(priority: LogLevel, tag: String?, message: String, error: Error?) {}
 
-    nonisolated(unsafe) func prepareLog(
+    nonisolated func prepareLog(
         priority: LogLevel,
         message: @escaping @autoclosure () -> String,
         arguments: [CVarArg],
@@ -66,8 +63,15 @@ open class Tree {
         )
     }
 
-    nonisolated(unsafe) func formatMessage(_ template: String, _ args: [CVarArg]) -> String {
+    nonisolated func formatMessage(_ template: String, _ args: [CVarArg]) -> String {
+        guard !template.isEmpty else { return template }
         guard !args.isEmpty else { return template }
+
+        let specifierCount = template.components(separatedBy: "%").count - 1
+        if specifierCount != args.count {
+            return template
+        }
+
         return String(format: template, arguments: args)
     }
 }

@@ -12,9 +12,9 @@ import UIKit
 #endif
 
 enum CanopyContext {
-    private static let threadKey = "CanopyContext.current"
+    nonisolated private static let threadKey = "CanopyContext.current"
 
-    static var current: String? {
+    nonisolated static var current: String? {
         get {
             Thread.current.threadDictionary[threadKey] as? String
         }
