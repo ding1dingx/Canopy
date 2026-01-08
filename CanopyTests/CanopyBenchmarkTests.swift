@@ -237,7 +237,7 @@ final class CanopyBenchmarkTests: XCTestCase {
 
 // MARK: - Test Tree Helper
 
-private final class BenchmarkTestTree: Tree {
+private final class BenchmarkTestTree: Tree, @unchecked Sendable {
     var logs: [(LogLevel, String)] = []
 
     nonisolated override func log(priority: LogLevel, tag: String?, message: String, error: Error?) {
