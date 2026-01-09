@@ -36,6 +36,12 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
     private let lock = NSLock()
 
     public init(maxSize: Int = 100) {
+        guard maxSize > 0 else {
+            fatalError("CrashBufferTree: maxSize must be greater than 0, got \(maxSize)")
+        }
+        guard maxSize <= 10000 else {
+            fatalError("CrashBufferTree: maxSize too large, limit is 10000, got \(maxSize)")
+        }
         self.maxSize = maxSize
         super.init()
 
@@ -54,7 +60,8 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
 
     private nonisolated func checkAndFlushOnCrash() {
         if crashSignalOccurred == 1 {
-            flush()
+            // Do not flush in signal handler - NSLock is not async-signal-safe
+            // Flush only happens via atexit() handler
             crashSignalOccurred = 0
         }
     }
@@ -74,7 +81,8 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
         let effectiveTag = explicitTag ?? tag
         explicitTag = nil
 
-        let msg = "[\(priority)] \(effectiveTag ?? ""): \(message())"
+        let tagString = effectiveTag ?? ""
+        let msg = tagString.isEmpty ? "[\(priority)] : \(message())" : "[\(priority)] : \(tagString): \(message())"
         lock.lock()
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }
@@ -84,9 +92,23 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
     nonisolated func flush() {
         lock.lock()
         defer { lock.unlock() }
-        guard let data = buffer.joined(separator: "\n").data(using: .utf8) else { return }
-        guard let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") else { return }
-        try? data.write(to: url, options: .atomic)
+
+        guard let data = buffer.joined(separator: "\n").data(using: .utf8) else {
+            NSLog("Canopy: Failed to encode buffer to UTF-8")
+            return
+        }
+
+        guard let url = documentsURL()?.appendingPathComponent("canopy_crash_buffer.txt") else {
+            NSLog("Canopy: Failed to get documents directory")
+            return
+        }
+
+        do {
+            try data.write(to: url, options: .atomic)
+            NSLog("Canopy: Successfully flushed \(buffer.count) logs to \(url.path)")
+        } catch {
+            NSLog("Canopy: Failed to flush buffer to \(url.path): \(error.localizedDescription)")
+        }
     }
 
     nonisolated private func documentsURL() -> URL? {

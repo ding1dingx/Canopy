@@ -31,11 +31,18 @@ open class DebugTree: Tree, @unchecked Sendable {
 
         let fileName = (file.withUTF8Buffer { String(decoding: $0, as: UTF8.self) } as NSString).lastPathComponent
         let sourceRef = "\(fileName):\(line)"
-        let output = "[\(effectiveTag)] \(fullMessage) (\(sourceRef))"
+
+        let output: String
+        if effectiveTag.isEmpty {
+            output = "\(fullMessage) (\(sourceRef))"
+        } else {
+            output = "[\(effectiveTag)] \(fullMessage) (\(sourceRef))"
+        }
 
         #if canImport(os.log)
         if #available(macOS 11.0, iOS 14.0, *) {
-            let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Canopy", category: effectiveTag)
+            let subsystem = Bundle.main.bundleIdentifier ?? "com.canopy.logger"
+            let logger = Logger(subsystem: subsystem, category: effectiveTag)
             let osLevel: OSLogType = priority.osLogLevel
             logger.log(level: osLevel, "\(output)")
             return
@@ -63,9 +70,8 @@ open class DebugTree: Tree, @unchecked Sendable {
 private extension LogLevel {
     nonisolated var osLogLevel: OSLogType {
         switch self {
-        case .verbose, .debug: return .debug
+        case .verbose, .debug, .warning: return .debug
         case .info: return .info
-        case .warning: return .error
         case .error: return .fault
         }
     }

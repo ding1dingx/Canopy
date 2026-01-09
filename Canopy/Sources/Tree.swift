@@ -21,7 +21,7 @@ open class Tree: @unchecked Sendable {
 
     @discardableResult
     nonisolated open func tag(_ tag: String?) -> Self {
-        self.explicitTag = tag?.isEmpty == false ? tag : nil
+        self.explicitTag = (tag?.isEmpty ?? true) ? nil : tag
         return self
     }
 

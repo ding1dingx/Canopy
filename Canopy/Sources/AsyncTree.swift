@@ -41,6 +41,7 @@ public final class AsyncTree: Tree, @unchecked Sendable {
         queue.async { [wrapped] in
             let previous = CanopyContext.current
             CanopyContext.current = currentContext
+            defer { CanopyContext.current = previous }
 
             wrapped.log(
                 priority: priority,
@@ -52,8 +53,6 @@ public final class AsyncTree: Tree, @unchecked Sendable {
                 function: function,
                 line: line
             )
-
-            CanopyContext.current = previous
         }
     }
 }
