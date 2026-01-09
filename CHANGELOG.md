@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+---
+
+## [0.2.0] - 2026-01-09
 
 ### Added
 
@@ -38,6 +40,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tree.tag()**: Fixed logic to correctly handle empty and whitespace-only strings
 - Thread safety issues with `explicitTag` in concurrent scenarios
 - Code duplication in Canopy.swift (reduced from 169 to 138 lines)
+
+### Performance
+
+- Format message performance improved by ~10%
+- Added performance benchmarks for all critical paths
+- Zero-overhead logging verified in Release mode
+
+### Security
+
+- **CrashBufferTree**: Fixed potential deadlock in signal handlers by moving flush to atexit() handler
+- **Input validation**: Added parameter validation to prevent invalid input scenarios
+
+### BREAKING CHANGES
+
+- **None** - This release is fully backward compatible with 0.1.0
+
+---
+
+## [Unreleased]
+
+### Added
+
+- (Future development section)
 - SwiftLint violations across the codebase
 
 ### Performance
@@ -88,7 +113,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status |
 |---------|------|--------|
-| [Unreleased] | - | In development |
 | [0.2.0] | 2026-01-09 | **Current Release** - Stability & Security Improvements |
 | [0.1.0] | 2026-01-08 | Initial release |
 
