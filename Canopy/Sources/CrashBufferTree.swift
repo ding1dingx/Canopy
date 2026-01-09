@@ -60,7 +60,8 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
 
     private nonisolated func checkAndFlushOnCrash() {
         if crashSignalOccurred == 1 {
-            flush()
+            // Do not flush in signal handler - NSLock is not async-signal-safe
+            // Flush only happens via atexit() handler
             crashSignalOccurred = 0
         }
     }
@@ -80,7 +81,8 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
         let effectiveTag = explicitTag ?? tag
         explicitTag = nil
 
-        let msg = "[\(priority)] \(effectiveTag ?? ""): \(message())"
+        let tagString = effectiveTag ?? ""
+        let msg = tagString.isEmpty ? "[\(priority)] : \(message())" : "[\(priority)] : \(tagString): \(message())"
         lock.lock()
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }
