@@ -17,15 +17,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SwiftLint configuration with code quality rules
 - Platform-aware lock implementation
 - Documentation for testing and CI/CD
+- **Parameter validation**: CrashBufferTree now validates `maxSize` (must be > 0 and <= 10000)
+- **Tag length validation**: CanopyContext.with() now validates tag length (max 100 characters)
+- **Flush failure logging**: CrashBufferTree now logs flush failures via NSLog
+- **Comprehensive test coverage**: Increased from 87 to 91 tests
 
 ### Changed
 
 - `formatMessage()`: Optimized to use single-pass counting instead of `components(separatedBy:)`
 - `Tree.tag()`: Fixed race condition by reading and clearing atomically
 - `Canopy.log()`: Eliminated code duplication, consolidated two log method overloads
+- **Empty tag format**: Improved readability - empty tags now display as `[priority]: message` instead of `[] message`
+- **DebugTree log level**: Fixed `warning` level mapping from `.error` to `.debug` for accurate OSLogType mapping
 
 ### Fixed
 
+- **Signal handler safety**: Removed `flush()` from signal handlers to prevent deadlocks (NSLock is not async-signal-safe)
+- **AsyncTree context recovery**: Added `defer` to ensure CanopyContext is restored even if log() throws
+- **CanopyContext.with()**: Added whitespace trimming and empty string handling
+- **Tree.tag()**: Fixed logic to correctly handle empty and whitespace-only strings
 - Thread safety issues with `explicitTag` in concurrent scenarios
 - Code duplication in Canopy.swift (reduced from 169 to 138 lines)
 - SwiftLint violations across the codebase
@@ -35,6 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Format message performance improved by ~10%
 - Added performance benchmarks for all critical paths
 - Zero-overhead logging verified in Release mode
+
+### Security
+
+- **CrashBufferTree**: Fixed potential deadlock in signal handlers by moving flush to atexit() handler
+- **Input validation**: Added parameter validation to prevent invalid input scenarios
 
 ---
 
@@ -74,20 +89,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Date | Status |
 |---------|------|--------|
 | [Unreleased] | - | In development |
+| [0.2.0] | 2026-01-09 | **Current Release** - Stability & Security Improvements |
 | [0.1.0] | 2026-01-08 | Initial release |
 
 ---
 
 ## Migration Guides
 
-### Upgrading from 0.1.0
+### Migration Guides
 
-No breaking changes in unreleased version. API remains fully backward compatible.
+### Upgrading from 0.1.0 to 0.2.0
+
+No breaking changes. API remains fully backward compatible. Recommended changes:
+
+1. **New validations**: CrashBufferTree now validates `maxSize` parameter. Ensure your code uses valid values (1-10000).
+2. **Improved tag handling**: Empty tags now display more cleanly. No action needed.
+3. **Security fix**: Signal handler safety improved. No action needed.
 
 ### Migration Checklist
 
 1. Update dependency version in `Package.swift` or `Podfile`
-2. Review new API additions if needed
+2. Review new parameter validation if using CrashBufferTree with custom maxSize
 3. Run test suite to verify compatibility
 
 ---

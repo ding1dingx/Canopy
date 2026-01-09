@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Canopy'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = 'A lightweight, high-performance logging framework for iOS'
   s.description      = <<-DESC
 Canopy is a logging framework inspired by Android's Timber, using a Tree-based architecture.
