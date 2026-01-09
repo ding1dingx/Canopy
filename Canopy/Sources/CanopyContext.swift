@@ -43,8 +43,15 @@ enum CanopyContext {
     /// - Returns: The return value of the block
     @discardableResult
     nonisolated static func with<T>(_ tag: String?, block: () throws -> T) rethrows -> T {
+        let trimmedTag = tag?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let effectiveTag = (trimmedTag?.isEmpty ?? true) ? nil : trimmedTag
+
+        if let effectiveTag, effectiveTag.count > 100 {
+            fatalError("CanopyContext.with: Tag too long (max 100 chars), got \(effectiveTag.count) chars")
+        }
+
         let previous = current
-        current = tag
+        current = effectiveTag
         defer { current = previous }
         return try block()
     }
