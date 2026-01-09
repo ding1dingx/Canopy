@@ -1,6 +1,6 @@
 # Canopy
 
-> 🌲 Canopy: A tree canopy covering your entire app's forest with comprehensive logging insights.
+> 🌲 A tree canopy covering your entire app's forest with comprehensive logging insights.
 
 A lightweight, high-performance logging framework for iOS, inspired by Android's Timber.
 
@@ -77,6 +77,26 @@ Canopy.plant(DebugTree())
 
 ### CrashBufferTree
 Stores recent logs in memory. On crash, saves them to file for analysis.
+
+**Parameter Validation:**
+- `maxSize` must be > 0 (throws fatalError if 0 or negative)
+- `maxSize` must be <= 10000 (throws fatalError if exceeded)
+- Recommended range: 10-500 for optimal performance
+
+**Empty Tag Handling:**
+- When tag is `nil` or empty, the log format is `[priority]: message`
+- No square brackets `[]` are displayed for empty tags
+- This improves readability and avoids confusing `[nil] message` output
+
+**Signal Handler Safety:**
+- `flush()` is NOT called in signal handlers (NSLock is not async-signal-safe)
+- Flush only occurs via `atexit()` handler on normal app termination
+- Signal handlers only set the crash flag, actual flush happens safely
+
+**Flush Failure Logging:**
+- Failed flush operations are logged via `NSLog`
+- Errors: UTF-8 encoding failure, missing documents directory, file write errors
+- Success: Number of logs flushed and file path are logged
 
 ```swift
 let crashTree = CrashBufferTree(maxSize: 100)

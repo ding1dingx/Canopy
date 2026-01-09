@@ -82,6 +82,26 @@ Canopy.plant(DebugTree())
 
 在内存中保存最近的日志。崩溃时保存到文件用于分析。
 
+**参数验证：**
+- `maxSize` 必须 > 0（如果为 0 或负数会抛出 fatalError）
+- `maxSize` 必须 <= 10000（如果超出限制会抛出 fatalError）
+- 推荐范围：10-500 以获得最佳性能
+
+**空标签处理：**
+- 当 tag 为 `nil` 或空时，日志格式为 `[priority]: message`
+- 空标签不会显示方括号 `[]`
+- 这提高了可读性，避免了令人困惑的 `[nil] message` 输出
+
+**信号处理器安全：**
+- `flush()` **不会**在信号处理器中调用（NSLock 不是 async-signal-safe）
+- Flush 只在正常程序终止时通过 `atexit()` 处理器发生
+- 信号处理器只设置崩溃标志，实际的 flush 安全发生
+
+**Flush 失败日志：**
+- 失败的 flush 操作通过 `NSLog` 记录
+- 错误：UTF-8 编码失败、缺少文档目录、文件写入错误
+- 成功：记录 flush 的日志数量和文件路径
+
 ```swift
 let crashTree = CrashBufferTree(maxSize: 100)
 Canopy.plant(crashTree)

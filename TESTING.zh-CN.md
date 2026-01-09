@@ -41,7 +41,7 @@ swift test --enable-code-coverage
 
 | 套件 | 测试数 | 描述 |
 |------|--------|------|
-| CanopyTests | 24 | 核心日志功能 |
+| CanopyTests | 27 | 核心日志功能 |
 | TreeTests | 15 | Tree 基类 |
 | DebugTreeTests | 5 | DebugTree 功能 |
 | AsyncTreeTests | 8 | AsyncTree 功能 |
@@ -49,7 +49,7 @@ swift test --enable-code-coverage
 | CanopyBenchmarkTests | 15 | 性能基准测试 |
 | CanopyCrashRecoveryTests | 12 | 崩溃恢复集成测试 |
 
-**总计：87 个测试**
+**总计：91 个测试**
 
 ---
 
