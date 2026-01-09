@@ -16,7 +16,7 @@ Features:
   s.homepage         = 'https://github.com/ding1dingx/Canopy'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'syxc' => 'nian1.wiki@gmail.com' }
-  s.source           = { :git => 'https://github.com/ding1dingx/Canopy.git', :tag => s.version.to_s }
+  s.source           = { :git => 'git@github.com:ding1dingx/Canopy.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '14.0'
   s.swift_version = '5.0'
