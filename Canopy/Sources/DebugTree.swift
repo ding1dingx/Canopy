@@ -32,7 +32,12 @@ open class DebugTree: Tree, @unchecked Sendable {
         let fileName = (file.withUTF8Buffer { String(decoding: $0, as: UTF8.self) } as NSString).lastPathComponent
         let sourceRef = "\(fileName):\(line)"
 
-        let output = effectiveTag.isEmpty ? "\(fullMessage) (\(sourceRef))" : "[\(effectiveTag)] \(fullMessage) (\(sourceRef))"
+        let output: String
+        if effectiveTag.isEmpty {
+            output = "\(fullMessage) (\(sourceRef))"
+        } else {
+            output = "[\(effectiveTag)] \(fullMessage) (\(sourceRef))"
+        }
 
         #if canImport(os.log)
         if #available(macOS 11.0, iOS 14.0, *) {
