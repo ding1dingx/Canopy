@@ -19,6 +19,8 @@ open class Tree: @unchecked Sendable {
     /// Marked as nonisolated(unsafe) because subclasses use locks for thread safety.
     nonisolated(unsafe) open var minLevel: LogLevel = .verbose
 
+    public init() {}
+
     @discardableResult
     nonisolated open func tag(_ tag: String?) -> Self {
         self.explicitTag = (tag?.isEmpty ?? true) ? nil : tag
