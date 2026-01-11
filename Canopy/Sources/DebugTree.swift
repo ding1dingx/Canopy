@@ -15,7 +15,7 @@ import os.log
 /// Uses os.log on supported platforms, falls back to NSLog.
 open class DebugTree: Tree, @unchecked Sendable {
 
-    public init() {
+    public override init() {
         super.init()
     }
 
