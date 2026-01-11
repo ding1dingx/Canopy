@@ -185,8 +185,8 @@ All tests must pass before merging.
 
 1. Update version in `Package.swift`
 2. Update CHANGELOG.md with new version
-3. Create git tag (`git tag v0.2.0`)
-4. Push tag (`git push origin v0.2.0`)
+3. Create git tag (`git tag v0.2.1`)
+4. Push tag (`git push origin v0.2.1`)
 
 ### Release Checklist
 
@@ -201,7 +201,7 @@ All tests must pass before merging.
 ### Release Notes Format
 
 ```markdown
-## v0.2.0
+## v0.2.1
 
 ### New Features
 - Feature description
