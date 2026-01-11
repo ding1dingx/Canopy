@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] - 2026-01-12
+
+### Changed
+
+- **CocoaPods source URL**: Updated `s.source` from SSH git protocol to HTTPS for improved compatibility
+
+### Fixed
+
+- None
+
+### BREAKING CHANGES
+
+- **None** - This release is fully backward compatible with 0.2.0
+
+---
+
 ## [0.2.0] - 2026-01-09
 
 ### Added
@@ -36,8 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Signal handler safety**: Removed `flush()` from signal handlers to prevent deadlocks (NSLock is not async-signal-safe)
 - **AsyncTree context recovery**: Added `defer` to ensure CanopyContext is restored even if log() throws
-- **CanopyContext.with()**: Added whitespace trimming and empty string handling
-- **Tree.tag()**: Fixed logic to correctly handle empty and whitespace-only strings
+- **CanopyContext.with()`: Added whitespace trimming and empty string handling
+- **Tree.tag()`: Fixed logic to correctly handle empty and whitespace-only strings
 - Thread safety issues with `explicitTag` in concurrent scenarios
 - Code duplication in Canopy.swift (reduced from 169 to 138 lines)
 
@@ -63,18 +79,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - (Future development section)
-- SwiftLint violations across the codebase
-
-### Performance
-
-- Format message performance improved by ~10%
-- Added performance benchmarks for all critical paths
-- Zero-overhead logging verified in Release mode
-
-### Security
-
-- **CrashBufferTree**: Fixed potential deadlock in signal handlers by moving flush to atexit() handler
-- **Input validation**: Added parameter validation to prevent invalid input scenarios
 
 ---
 
@@ -113,7 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status |
 |---------|------|--------|
-| [0.2.0] | 2026-01-09 | **Current Release** - Stability & Security Improvements |
+| [0.2.1] | 2026-01-12 | **Current Release** - Update source URL to HTTPS |
+| [0.2.0] | 2026-01-09 | Stability & Security Improvements |
 | [0.1.0] | 2026-01-08 | Initial release |
 
 ---
