@@ -20,11 +20,11 @@ Add Canopy to your project using Swift Package Manager or CocoaPods:
 ```bash
 # Swift Package Manager
 dependencies: [
-    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.1")
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.2")
 ]
 
 # CocoaPods
-pod 'Canopy', '~> 0.2.1'
+pod 'Canopy', '~> 0.2.2'
 ```
 
 Initialize in your `AppDelegate`:

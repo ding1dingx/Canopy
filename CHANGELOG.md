@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-01-12
+
+### Fixed
+
+- **DebugTree accessibility**: Added explicit `public init()` to DebugTree to resolve compilation error when using DebugTree in external modules ("DebugTree initializer is inaccessible due to 'internal' protection level")
+
+### BREAKING CHANGES
+
+- **None** - This release is fully backward compatible with 0.2.1
+
+---
+
 ## [0.2.1] - 2026-01-12
 
 ### Changed
@@ -117,7 +129,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status |
 |---------|------|--------|
-| [0.2.1] | 2026-01-12 | **Current Release** - Update source URL to HTTPS |
+| [0.2.2] | 2026-01-12 | **Current Release** - Fix DebugTree accessibility |
+| [0.2.1] | 2026-01-12 | Update source URL to HTTPS |
 | [0.2.0] | 2026-01-09 | Stability & Security Improvements |
 | [0.1.0] | 2026-01-08 | Initial release |
 

@@ -20,11 +20,11 @@
 ```bash
 # Swift Package Manager
 dependencies: [
-    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.1")
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.2")
 ]
 
 # CocoaPods
-pod 'Canopy', '~> 0.2.1'
+pod 'Canopy', '~> 0.2.2'
 ```
 
 在 `AppDelegate` 中初始化：
