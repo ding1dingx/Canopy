@@ -187,13 +187,21 @@ open class MyCustomTree: Tree {
         error: Error?
     ) {
         // Implement your logging logic
-        // 1. Format log
-        let formatted = formatLog(priority, tag, message, error)
+        // 1. Handle error if present
+        var fullMessage = message
+        if let err = error {
+            fullMessage += " | Error: \(err.localizedDescription)"
+            // You can also capture error details for structured logging
+            // sendErrorTracking(err)
+        }
 
-        // 2. Send to service
+        // 2. Format log
+        let formatted = formatLog(priority, tag, fullMessage)
+
+        // 3. Send to service
         sendToService(formatted)
 
-        // 3. Local cache (optional)
+        // 4. Local cache (optional)
         cacheLocally(formatted)
     }
 }

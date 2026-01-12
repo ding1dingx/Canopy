@@ -187,13 +187,21 @@ open class MyCustomTree: Tree {
         error: Error?
     ) {
         // 实现你的日志逻辑
-        // 1. 格式化日志
-        let formatted = formatLog(priority, tag, message, error)
+        // 1. 处理 error（如果存在）
+        var fullMessage = message
+        if let err = error {
+            fullMessage += " | Error: \(err.localizedDescription)"
+            // 你还可以捕获 error 详情用于结构化日志
+            // sendErrorTracking(err)
+        }
 
-        // 2. 发送到服务
+        // 2. 格式化日志
+        let formatted = formatLog(priority, tag, fullMessage)
+
+        // 3. 发送到服务
         sendToService(formatted)
 
-        // 3. 本地缓存（可选）
+        // 4. 本地缓存（可选）
         cacheLocally(formatted)
     }
 }

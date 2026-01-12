@@ -36,6 +36,108 @@ public struct TaggedTreeProxy {
     public func e(_ message: @autoclosure () -> String, _ args: CVarArg..., file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
         Canopy.log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: tag)
     }
+
+    // MARK: - Log Methods with Error
+
+    public func v(
+        _ message: @autoclosure () -> String,
+        error: Error?,
+        _ args: CVarArg...,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        Canopy.log(
+            LogLevel.verbose,
+            message(),
+            args,
+            file: file,
+            function: function,
+            line: line,
+            withTag: tag,
+            error: error
+        )
+    }
+
+    public func d(
+        _ message: @autoclosure () -> String,
+        error: Error?,
+        _ args: CVarArg...,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        Canopy.log(
+            LogLevel.debug,
+            message(),
+            args,
+            file: file,
+            function: function,
+            line: line,
+            withTag: tag,
+            error: error
+        )
+    }
+
+    public func i(
+        _ message: @autoclosure () -> String,
+        error: Error?,
+        _ args: CVarArg...,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        Canopy.log(
+            LogLevel.info,
+            message(),
+            args,
+            file: file,
+            function: function,
+            line: line,
+            withTag: tag,
+            error: error
+        )
+    }
+
+    public func w(
+        _ message: @autoclosure () -> String,
+        error: Error?,
+        _ args: CVarArg...,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        Canopy.log(
+            LogLevel.warning,
+            message(),
+            args,
+            file: file,
+            function: function,
+            line: line,
+            withTag: tag,
+            error: error
+        )
+    }
+
+    public func e(
+        _ message: @autoclosure () -> String,
+        error: Error?,
+        _ args: CVarArg...,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        Canopy.log(
+            LogLevel.error,
+            message(),
+            args,
+            file: file,
+            function: function,
+            line: line,
+            withTag: tag,
+            error: error
+        )
+    }
 }
 
 /// The main entry point for the Canopy logging framework.
@@ -87,6 +189,28 @@ public enum Canopy {
         log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: tag)
     }
 
+    // MARK: - Log Methods with Error
+
+    public static func v(_ message: @autoclosure () -> String, error: Error?, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.verbose, message(), args, file: file, function: function, line: line, withTag: tag, error: error)
+    }
+
+    public static func d(_ message: @autoclosure () -> String, error: Error?, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.debug, message(), args, file: file, function: function, line: line, withTag: tag, error: error)
+    }
+
+    public static func i(_ message: @autoclosure () -> String, error: Error?, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.info, message(), args, file: file, function: function, line: line, withTag: tag, error: error)
+    }
+
+    public static func w(_ message: @autoclosure () -> String, error: Error?, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.warning, message(), args, file: file, function: function, line: line, withTag: tag, error: error)
+    }
+
+    public static func e(_ message: @autoclosure () -> String, error: Error?, _ args: CVarArg..., tag: String? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        log(LogLevel.error, message(), args, file: file, function: function, line: line, withTag: tag, error: error)
+    }
+
     // MARK: - Internal Helpers
 
     private static func hasNonDebugTrees() -> Bool {
@@ -106,7 +230,8 @@ public enum Canopy {
         file: StaticString,
         function: StaticString,
         line: UInt,
-        withTag tag: String?
+        withTag tag: String?,
+        error: Error? = nil
     ) {
         #if !DEBUG
         guard hasNonDebugTrees() else { return }
@@ -126,7 +251,7 @@ public enum Canopy {
                 tag: nil,
                 message: message,
                 arguments: args,
-                error: nil,
+                error: error,
                 file: file,
                 function: function,
                 line: line
