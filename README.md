@@ -11,7 +11,8 @@ A lightweight, high-performance logging framework for iOS, inspired by Android's
 - **iOS 14+ Support** - Uses only Swift standard library and Foundation
 - **No External Dependencies** - Pure Swift implementation
 - **Thread Safe** - Lock-protected concurrent access
-- **Comprehensive Testing** - 91 tests with performance benchmarks
+- **Comprehensive Testing** - 102 tests with performance benchmarks
+- **Error Parameter Support** - Pass Error objects to log methods for error tracking services like Sentry
 
 ## Quick Start
 
@@ -20,11 +21,11 @@ Add Canopy to your project using Swift Package Manager or CocoaPods:
 ```bash
 # Swift Package Manager
 dependencies: [
-    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.2")
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.3")
 ]
 
 # CocoaPods
-pod 'Canopy', '~> 0.2.2'
+pod 'Canopy', '~> 0.2.3'
 ```
 
 Initialize in your `AppDelegate`:
@@ -65,6 +66,54 @@ Canopy.v("Network request", tag: "Network")
 | `Canopy.i()` | Info | General information |
 | `Canopy.w()` | Warning | Potential issues |
 | `Canopy.e()` | Error | Errors and failures |
+
+## Logging with Errors
+
+Canopy supports passing `Error` objects to log methods. This is particularly useful for error tracking services like Sentry.
+
+### Basic Usage
+
+```swift
+do {
+    try someThrowingOperation()
+} catch {
+    // Error object is captured and can be sent to error tracking services
+    Canopy.e("Operation failed", error: error)
+}
+```
+
+### With Format Arguments
+
+```swift
+Canopy.e("Failed to fetch user %@ (attempt %d)", error: networkError, userId, retryCount)
+```
+
+### All Log Levels Support Errors
+
+```swift
+Canopy.v("Detailed info", error: error)
+Canopy.d("Debug info", error: error)
+Canopy.i("Info with error", error: error)
+Canopy.w("Warning with error", error: error)
+Canopy.e("Error occurred", error: error)
+```
+
+### Tagged Logging with Errors
+
+```swift
+Canopy.tag("Network").e("Request failed", error: networkError)
+Canopy.tag("Database").w("Query slow", error: dbError)
+```
+
+### Backward Compatibility
+
+The original API without error parameters still works:
+
+```swift
+Canopy.e("Simple error message")
+```
+
+This is equivalent to passing `error: nil`.
 
 ## Tree Types
 

@@ -11,7 +11,8 @@
 - **iOS 14+ 支持** - 仅使用 Swift 标准库和 Foundation
 - **无外部依赖** - 纯 Swift 实现
 - **线程安全** - 锁保护的并发访问
-- **全面测试** - 91 个测试用例，包含性能基准测试
+- **全面测试** - 102 个测试用例，包含性能基准测试
+- **Error 参数支持** - 传递 Error 对象到日志方法，支持 Sentry 等错误跟踪服务
 
 ## 快速开始
 
@@ -20,11 +21,11 @@
 ```bash
 # Swift Package Manager
 dependencies: [
-    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.2")
+    .package(url: "https://github.com/ding1dingx/Canopy.git", from: "0.2.3")
 ]
 
 # CocoaPods
-pod 'Canopy', '~> 0.2.2'
+pod 'Canopy', '~> 0.2.3'
 ```
 
 在 `AppDelegate` 中初始化：
@@ -67,6 +68,54 @@ Canopy.v("Network request", tag: "Network")
 | `Canopy.i()` | Info | 一般信息 |
 | `Canopy.w()` | Warning | 潜在问题 |
 | `Canopy.e()` | Error | 错误和失败 |
+
+## 带 Error 的日志
+
+Canopy 支持将 `Error` 对象传递给日志方法。这对于 Sentry 等错误跟踪服务特别有用。
+
+### 基本用法
+
+```swift
+do {
+    try someThrowingOperation()
+} catch {
+    // Error 对象会被捕获，可以发送到错误跟踪服务
+    Canopy.e("操作失败", error: error)
+}
+```
+
+### 带格式化参数
+
+```swift
+Canopy.e("获取用户 %@ 失败（第 %d 次尝试）", error: networkError, userId, retryCount)
+```
+
+### 所有日志级别都支持 Error
+
+```swift
+Canopy.v("详细信息", error: error)
+Canopy.d("调试信息", error: error)
+Canopy.i("信息与错误", error: error)
+Canopy.w("警告与错误", error: error)
+Canopy.e("发生错误", error: error)
+```
+
+### 带标签的 Error 日志
+
+```swift
+Canopy.tag("Network").e("请求失败", error: networkError)
+Canopy.tag("Database").w("查询缓慢", error: dbError)
+```
+
+### 向后兼容性
+
+不带 error 参数的原始 API 仍然有效：
+
+```swift
+Canopy.e("简单错误消息")
+```
+
+这等价于传递 `error: nil`。
 
 ## Tree 类型
 

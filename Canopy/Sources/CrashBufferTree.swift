@@ -82,11 +82,19 @@ public final class CrashBufferTree: Tree, @unchecked Sendable {
         explicitTag = nil
 
         let tagString = effectiveTag ?? ""
-        let msg = tagString.isEmpty ? "[\(priority)] : \(message())" : "[\(priority)] : \(tagString): \(message())"
+        let fullMessage = buildFullMessage(message(), error: error)
+        let msg = tagString.isEmpty ? "[\(priority)] : \(fullMessage)" : "[\(priority)] : \(tagString): \(fullMessage)"
         lock.lock()
         buffer.append(msg)
         if buffer.count > maxSize { buffer.removeFirst() }
         lock.unlock()
+    }
+
+    nonisolated private func buildFullMessage(_ message: String, error: Error?) -> String {
+        if let err = error {
+            return "\(message) | Error: \(err.localizedDescription)"
+        }
+        return message
     }
 
     nonisolated func flush() {

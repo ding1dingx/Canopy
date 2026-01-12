@@ -349,6 +349,210 @@ final class CanopyTests: XCTestCase {
 
         XCTAssertNil(CanopyContext.current, "Context should be restored even after error")
     }
+
+    func testLoggingWithError() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "TestDomain", code: 42, userInfo: [NSLocalizedDescriptionKey: "Test error"])
+
+        Canopy.e("Error occurred", error: testError)
+
+        XCTAssertEqual(tree.logs.count, 1)
+        XCTAssertEqual(tree.logs.first?.level, .error)
+        XCTAssertNotNil(tree.logs.first?.error)
+
+        let loggedError = tree.logs.first?.error as? NSError
+        XCTAssertEqual(loggedError?.code, 42)
+        XCTAssertEqual(loggedError?.domain, "TestDomain")
+    }
+
+    func testLoggingWithNilError() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        Canopy.e("Error without error object", error: nil)
+
+        XCTAssertEqual(tree.logs.count, 1)
+        XCTAssertEqual(tree.logs.first?.level, .error)
+        XCTAssertNil(tree.logs.first?.error)
+    }
+
+    func testAllLogLevelsWithError() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "Test", code: 1, userInfo: nil)
+
+        Canopy.v("Verbose", error: testError)
+        Canopy.d("Debug", error: testError)
+        Canopy.i("Info", error: testError)
+        Canopy.w("Warning", error: testError)
+        Canopy.e("Error", error: testError)
+
+        XCTAssertEqual(tree.logs.count, 5)
+
+        for logEntry in tree.logs {
+            XCTAssertNotNil(logEntry.error)
+            XCTAssertEqual((logEntry.error as? NSError)?.code, 1)
+        }
+    }
+
+    func testTaggedLoggingWithError() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "Test", code: 99, userInfo: nil)
+
+        Canopy.tag("TestTag").e("Tagged error", error: testError)
+
+        XCTAssertEqual(tree.logs.count, 1)
+        XCTAssertEqual(tree.logs.first?.tag, "TestTag")
+        XCTAssertNotNil(tree.logs.first?.error)
+        XCTAssertEqual((tree.logs.first?.error as? NSError)?.code, 99)
+    }
+
+    func testLoggingWithFormatArgsAndError() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "Test", code: 123, userInfo: nil)
+
+        Canopy.e("Error %@ at %d", error: testError, "network", 42)
+
+        XCTAssertEqual(tree.logs.count, 1)
+        XCTAssertEqual(tree.logs.first?.message, "Error network at 42")
+        XCTAssertNotNil(tree.logs.first?.error)
+        XCTAssertEqual((tree.logs.first?.error as? NSError)?.code, 123)
+    }
+
+    func testMultipleTreesReceiveError() throws {
+        let tree1 = TestTree()
+        let tree2 = TestTree()
+        Canopy.plant(tree1, tree2)
+
+        let testError = NSError(domain: "MultiTree", code: 999, userInfo: nil)
+
+        Canopy.e("Error in multiple trees", error: testError)
+
+        XCTAssertEqual(tree1.logs.count, 1)
+        XCTAssertEqual(tree2.logs.count, 1)
+
+        XCTAssertNotNil(tree1.logs.first?.error)
+        XCTAssertNotNil(tree2.logs.first?.error)
+
+        XCTAssertEqual((tree1.logs.first?.error as? NSError)?.code, 999)
+        XCTAssertEqual((tree2.logs.first?.error as? NSError)?.code, 999)
+    }
+
+    func testErrorLoggingWithMinLevelFiltering() throws {
+        let tree = TestTree()
+        tree.minLevel = .error
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "FilterTest", code: 1, userInfo: nil)
+
+        Canopy.v("Verbose", error: testError)
+        Canopy.d("Debug", error: testError)
+        Canopy.i("Info", error: testError)
+        Canopy.w("Warning", error: testError)
+        Canopy.e("Error", error: testError)
+
+        XCTAssertEqual(tree.logs.count, 1)
+        XCTAssertEqual(tree.logs.first?.level, .error)
+    }
+
+    func testMixedNilAndNonNullErrors() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "Mixed", code: 42, userInfo: nil)
+
+        Canopy.e("Error with error", error: testError)
+        Canopy.e("Error without error", error: nil)
+        Canopy.e("Another error", error: testError)
+
+        XCTAssertEqual(tree.logs.count, 3)
+        XCTAssertNotNil(tree.logs[0].error)
+        XCTAssertNil(tree.logs[1].error)
+        XCTAssertNotNil(tree.logs[2].error)
+    }
+
+    func testHighVolumeLoggingWithErrors() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let testError = NSError(domain: "Volume", code: 1, userInfo: nil)
+
+        for i in 0..<1000 {
+            let error: Error? = i % 2 == 0 ? testError : nil
+            Canopy.e("Log entry %d", error: error, i)
+        }
+
+        XCTAssertEqual(tree.logs.count, 1000)
+
+        var errorCount = 0
+        for log in tree.logs {
+            if log.error != nil {
+                errorCount += 1
+            }
+        }
+        XCTAssertEqual(errorCount, 500)
+    }
+
+    func testErrorWithDifferentErrorTypes() throws {
+        let tree = TestTree()
+        Canopy.plant(tree)
+
+        let nsError = NSError(domain: "NSErrorDomain", code: 100, userInfo: nil)
+        let customError = CustomError.someError
+
+        Canopy.e("NSError", error: nsError)
+        Canopy.e("CustomError", error: customError)
+
+        XCTAssertEqual(tree.logs.count, 2)
+
+        XCTAssertNotNil(tree.logs[0].error)
+        switch tree.logs[0].error {
+        case let err as NSError:
+            XCTAssertEqual(err.domain, "NSErrorDomain")
+        default:
+            XCTFail("Expected NSError")
+        }
+
+        XCTAssertNotNil(tree.logs[1].error)
+        switch tree.logs[1].error {
+        case is CustomError:
+            break
+        default:
+            XCTFail("Expected CustomError")
+        }
+    }
+
+    func testErrorLoggingWithAsyncTree() throws {
+        let baseTree = TestTree()
+        let asyncTree = AsyncTree(wrapping: baseTree)
+        Canopy.plant(asyncTree)
+
+        let testError = NSError(domain: "Async", code: 777, userInfo: nil)
+
+        Canopy.e("Async error", error: testError)
+
+        let expectation = self.expectation(description: "Async logging")
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1.0)
+
+        XCTAssertEqual(baseTree.logs.count, 1)
+        XCTAssertNotNil(baseTree.logs.first?.error)
+        XCTAssertEqual((baseTree.logs.first?.error as? NSError)?.code, 777)
+    }
+}
+
+enum CustomError: Error {
+    case someError
 }
 
 class TestTree: Tree, @unchecked Sendable {
@@ -356,6 +560,7 @@ class TestTree: Tree, @unchecked Sendable {
         let level: LogLevel
         let tag: String?
         let message: String
+        let error: Error?
         let file: String
         let function: String
         let line: UInt
@@ -378,6 +583,7 @@ class TestTree: Tree, @unchecked Sendable {
             level: priority,
             tag: tag,
             message: message,
+            error: error,
             file: file,
             function: function,
             line: line

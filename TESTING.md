@@ -41,7 +41,7 @@ swift test --enable-code-coverage
 
 | Suite | Tests | Description |
 |-------|-------|-------------|
-| CanopyTests | 27 | Core logging functionality |
+| CanopyTests | 33 | Core logging functionality (including error parameter support) |
 | TreeTests | 15 | Tree base class |
 | DebugTreeTests | 5 | DebugTree functionality |
 | AsyncTreeTests | 8 | AsyncTree functionality |
@@ -49,7 +49,7 @@ swift test --enable-code-coverage
 | CanopyBenchmarkTests | 15 | Performance benchmarks |
 | CanopyCrashRecoveryTests | 12 | Crash recovery integration |
 
-**Total: 91 tests**
+**Total: 102 tests**
 
 ---
 

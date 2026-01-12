@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.3] - 2026-01-12
+
+### Added
+
+- **Error parameter support**: All log methods (`v`, `d`, `i`, `w`, `e`) now accept an optional `Error?` parameter
+- **Error propagation**: Error objects are now correctly passed to all Tree implementations
+- **Enhanced error handling**: Built-in Trees (DebugTree, CrashBufferTree, AsyncTree) now properly process and display error information
+- **Error-specific tests**: Added 6 new test cases to verify error parameter functionality across all log levels and scenarios
+- **Comprehensive error documentation**: Added "Logging with Errors" section to README (both English and Chinese)
+
+### Fixed
+
+- **Error parameter propagation**: Previously, `error` parameter was hardcoded to `nil` in internal `log()` method
+- **SentryTree compatibility**: Error objects are now correctly captured and can be sent to Sentry's `captureException()` instead of just `captureMessage()`
+- **CrashBufferTree error handling**: Error information is now included in buffered log messages
+
+### Changed
+
+- **Total test count**: Increased from 96 to 102 tests (6 new error-related tests)
+
+### BREAKING CHANGES
+
+- **None** - This release is fully backward compatible with 0.2.2
+- All existing APIs without `error` parameter continue to work
+- New `error` parameter is optional with default value `nil`
+
+---
+
 ## [0.2.2] - 2026-01-12
 
 ### Fixed
@@ -18,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### BREAKING CHANGES
 
 - **None** - This release is fully backward compatible with 0.2.1
-
 ---
 
 ## [0.2.1] - 2026-01-12
@@ -129,7 +156,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Status |
 |---------|------|--------|
-| [0.2.2] | 2026-01-12 | **Current Release** - Fix DebugTree accessibility |
+| [0.2.3] | 2026-01-12 | **Current Release** - Error parameter support |
+| [0.2.2] | 2026-01-12 | Fix DebugTree accessibility |
 | [0.2.1] | 2026-01-12 | Update source URL to HTTPS |
 | [0.2.0] | 2026-01-09 | Stability & Security Improvements |
 | [0.1.0] | 2026-01-08 | Initial release |
